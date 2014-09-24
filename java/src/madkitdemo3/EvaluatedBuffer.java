@@ -53,12 +53,14 @@ public class EvaluatedBuffer extends BufferAgent{
                     }else if(content.getClass()==Result.class){
                         Result res = ((ObjectMessage<Result>)mail).getContent();
                         addResult(res);
-                        if(getPopulationSize()>=800){
+                        if(getPopulationSize()>=400){
                             AgentAddress paretoSorterAddress = findAgent(COMMUNITY, aDesignTeam, archSorter);
                             
                             ObjectMessage paretoSortMail = new ObjectMessage(getCurrentPopulation());
-                            sendMessage(paretoSorterAddress,paretoSortMail);
-                            
+                            ObjectMessage<ArchPopulation> reply = (ObjectMessage<ArchPopulation>)sendMessageAndWaitForReply(paretoSorterAddress,paretoSortMail);
+                            clearPopulation();
+                            ArchPopulation paretoPopulation = reply.getContent();
+                            setPopulation(paretoPopulation.copyPopulation());
                             cleanUpBuffer();
                             logger.info("cleaning buffer");
 //                        logger.info("sending archs to sorter");
@@ -80,11 +82,6 @@ public class EvaluatedBuffer extends BufferAgent{
     }
     
     private void cleanUpBuffer(){
-        clearPopulation();
-        AgentAddress paretoBufferAddress = findAgent(COMMUNITY, aDesignTeam, bestArchBuffer);
-        Message reply = sendMessageAndWaitForReply(paretoBufferAddress,new Message());
-        ArchPopulation paretoPopulation = (ArchPopulation)((ObjectMessage)reply).getContent();
-        setPopulation(paretoPopulation.copyPopulation());
         
         //clear population from AE
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();

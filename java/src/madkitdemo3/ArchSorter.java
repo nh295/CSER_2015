@@ -41,6 +41,7 @@ public class ArchSorter extends DesignAgent{
     private ArrayList<SearchPerformance> perfs;
     private ResultManager RM;
     private SearchPerformance bestPerf;
+    private Stack<Result> results2Save;
     
     @Override
     protected void activate(){
@@ -53,14 +54,14 @@ public class ArchSorter extends DesignAgent{
         perfs = new ArrayList();
         RM =  ResultManager.getInstance();
         bestPerf = new SearchPerformance();
+        results2Save = new Stack();
     }
     
     @Override
     protected void live(){
         ArchPopulation fuzzyParetoArchs;
-        ArchPopulation newParetoArchs;
         
-        AgentAddress paretoOptimalAddress = findAgent(COMMUNITY, aDesignTeam, fuzzyParetoBuffer);
+        
         AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
@@ -72,28 +73,28 @@ public class ArchSorter extends DesignAgent{
                     
                     // Sort out top pareto ranked architecture
                     fuzzyParetoArchs = selection_NSGA2();
+                    
                     //send pareto front to tradespace agent to plot paretoFront
                     ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
                     
-                    sendMessage(paretoOptimalAddress,fuzzyParetoArchMessage);
+                    sendReply(mail,fuzzyParetoArchMessage);
                     sendMessage(tradespaceAddress,new Message()); //get tradespace to plot after every sort
                     
-                    break;
-                case bestArchBuffer:
-                    currentPopulation.clearPopulation();
-                    List<ArchPopulation> popToSort= (List<ArchPopulation>)((ObjectMessage)mail).getContent();
-
-                    fuzzyParetoArchs = popToSort.get(0);
-                    
-                    //merge the current best and the previous best
-                    currentPopulation.mergePopulation(fuzzyParetoArchs);
-                    currentPopulation.mergePopulation(popToSort.get(1));
-                    
-                    newParetoArchs = selection_NSGA2();
-                    
-                    ObjectMessage bestArchMessage = new ObjectMessage(newParetoArchs.copyPopulation());
-                    sendReply(mail,bestArchMessage);
-                    
+                    RM.saveResultCollection(new ResultCollection(results2Save));
+        
+                    iteration++;
+                    sp.updateSearchPerformance(results2Save, iteration);
+                    SearchPerformance spTemp = new SearchPerformance(sp);
+                    spm.saveSearchPerformance(spTemp);
+                    perfs.add(spTemp);
+        
+                    int best = spTemp.compareTo(bestPerf);
+                    if (best == 1) {
+                        bestPerf = new SearchPerformance(spTemp);
+                    }
+        
+                    SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
+                    spm.saveSearchPerformanceComparator(spc);
                     break;
                 default: logger.warning("unsupported sender: " + mail.getSender().getRole());
             }
@@ -148,26 +149,9 @@ public class ArchSorter extends DesignAgent{
         }
         
         // retrieve results
-        Stack<Result> results = new Stack<>();
+        results2Save.clear();
         for(Architecture arch:newPopList)
-            results.add(arch.getResult());
-        RM.saveResultCollection(new ResultCollection(results));
-        
-        iteration++;
-        sp.updateSearchPerformance(results, iteration);
-        SearchPerformance spTemp = new SearchPerformance(sp);
-        if(spTemp.getCheapest_max_benefit_arch()==null)
-            pause(10);
-        spm.saveSearchPerformance(spTemp);
-        perfs.add(spTemp);
-        
-        int best = spTemp.compareTo(bestPerf);
-        if (best == 1) {
-            bestPerf = new SearchPerformance(spTemp);
-        }
-        
-        SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
-        spm.saveSearchPerformanceComparator(spc);
+            results2Save.add(arch.getResult());
         
         //Update population
         return new ArchPopulation(newPopList);

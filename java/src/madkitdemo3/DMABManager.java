@@ -56,8 +56,6 @@ public class DMABManager extends DesignAgent{
         
         // initialize buffer agents
         bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
-        bufferAgents.addAll(launchAgentsIntoLive(FuzzyParetoBuffer.class.getName(),1));
-        bufferAgents.addAll(launchAgentsIntoLive(BestArchBuffer.class.getName(),1,true));
         
         ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
         ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 

@@ -39,7 +39,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> searchAgents = new ArrayList<>();
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
-    private final int populationSize = 100;
+    private final int populationSize = 200;
     
     @Override
     protected void activate() {
@@ -52,8 +52,6 @@ public class ATeamsManager extends DesignAgent{
         
         // initialize buffer agents
         bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
-        bufferAgents.addAll(launchAgentsIntoLive(FuzzyParetoBuffer.class.getName(),1));
-        bufferAgents.addAll(launchAgentsIntoLive(BestArchBuffer.class.getName(),1,true));
         
         ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
         ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 
@@ -138,7 +136,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int iters = 10000;
+        int iters = 20000;
     return n>=iters;
     }
     
