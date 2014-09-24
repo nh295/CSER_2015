@@ -403,7 +403,7 @@ public class ArchitectureEvaluator {
     
     public Result evaluateArchitecture(Architecture arch, String mode)
     {
-        if(arch.getResult().equals(new Result(arch,-1,-1,-1))){ //not yet evaluated
+        if(arch.getResult().getScience()==-1){ //not yet evaluated
             GenericTask t = new GenericTask( arch , mode);
             //ArrayList<Future<Result>> futures = new ArrayList<Future<Result>>();
             //tpe.execute(t);
