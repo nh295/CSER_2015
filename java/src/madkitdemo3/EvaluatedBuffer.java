@@ -53,17 +53,16 @@ public class EvaluatedBuffer extends BufferAgent{
                     }else if(content.getClass()==Result.class){
                         Result res = ((ObjectMessage<Result>)mail).getContent();
                         addResult(res);
-                        if(getPopulationSize()>0 && getPopulationSize()%400==0){
+                        if(getPopulationSize()>=800){
                             AgentAddress paretoSorterAddress = findAgent(COMMUNITY, aDesignTeam, archSorter);
                             
                             ObjectMessage paretoSortMail = new ObjectMessage(getCurrentPopulation());
                             sendMessage(paretoSorterAddress,paretoSortMail);
-//                        logger.info("sending archs to sorter");
-//                        logger.info("pop size"+Integer.toString(getPopulationSize()));
-                        }
-                        if(getPopulationSize()>=400){
+                            
                             cleanUpBuffer();
                             logger.info("cleaning buffer");
+//                        logger.info("sending archs to sorter");
+//                        logger.info("pop size"+Integer.toString(getPopulationSize()));
                         }
                     }
                     break;

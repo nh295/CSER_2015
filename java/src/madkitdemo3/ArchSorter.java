@@ -34,7 +34,7 @@ public class ArchSorter extends DesignAgent{
     // sent to their respective buffers
     
     private ArchPopulation currentPopulation;
-    private final int fuzzyParetoArchsWanted = 200;
+    private final int fuzzyParetoArchsWanted = 400;
     private static SearchPerformance sp;
     private SearchPerformanceManager spm;
     private int iteration = 0;
@@ -149,14 +149,15 @@ public class ArchSorter extends DesignAgent{
         
         // retrieve results
         Stack<Result> results = new Stack<>();
-        newPopList.stream().forEach((arch) -> {
+        for(Architecture arch:newPopList)
             results.add(arch.getResult());
-        });
         RM.saveResultCollection(new ResultCollection(results));
         
         iteration++;
         sp.updateSearchPerformance(results, iteration);
         SearchPerformance spTemp = new SearchPerformance(sp);
+        if(spTemp.getCheapest_max_benefit_arch()==null)
+            pause(10);
         spm.saveSearchPerformance(spTemp);
         perfs.add(spTemp);
         

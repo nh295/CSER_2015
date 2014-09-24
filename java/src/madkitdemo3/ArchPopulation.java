@@ -62,9 +62,8 @@ public final class ArchPopulation {
     }
     
     public void addAllArchs(List<Architecture> archList){
-        archList.stream().forEach((arch) -> {
+        for(Architecture arch: archList)
             addArch(arch);
-        });
     }
     
     public void clearPopulation(){

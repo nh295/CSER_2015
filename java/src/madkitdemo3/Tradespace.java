@@ -76,17 +76,15 @@ public class Tradespace extends DesignAgent{
         
         paretoFront1.clear();
         List<Architecture> paretoArchList= paretoArchs.asList();
-        paretoArchList.stream().forEach((arch) -> {
+        for(Architecture arch:paretoArchList)
             paretoFront1.add(arch.getResult().getScience(),arch.getResult().getCost());
-        });
     }
     
     private void updateHighScoringArch(ArchPopulation highScoreArchs){
         highScoringArchs.clear();
         List<Architecture> highScoreArchList= highScoreArchs.asList();
-        highScoreArchList.stream().forEach((arch) -> {
+        for(Architecture arch:highScoreArchList)
             highScoringArchs.add(arch.getResult().getScience(),arch.getResult().getCost());
-        });
     }
     
     private void plotChart(){

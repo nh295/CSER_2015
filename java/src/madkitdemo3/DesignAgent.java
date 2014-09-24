@@ -36,6 +36,7 @@ public class DesignAgent extends Agent implements IAgent{
         //look for agent to send to. If 
         AgentAddress receivingAgent = findAgent(receiverCommunity, receiverGroup, receiverRole);
         sendMessageWithRole(receivingAgent,new ObjectMessage(res),senderRole);
+        logger.info("Sent message to " + receiverRole);
         return true;
     }
     

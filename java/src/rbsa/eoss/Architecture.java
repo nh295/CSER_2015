@@ -1064,7 +1064,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
        //System.out.println("addRandomToSmallSat");
        return new Architecture(new_mat,nsats); 
     }
-    public Architecture bestNeighbor() {
+    public ArrayList<Architecture> bestNeighbor() {
         ArrayList<Architecture> neighbors = new ArrayList<Architecture>();
         for (int i = 0;i<bitString.length;i++) {
             boolean[] newbitString = new boolean[bitString.length];
@@ -1073,19 +1073,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
             Architecture arch = new Architecture(newbitString,norb,ninstr,nsats);
             neighbors.add(arch);
         }
-        ArchitectureEvaluator.getInstance().clearResults();
-        ArchitectureEvaluator.getInstance().setPopulation(neighbors);
-        ArchitectureEvaluator.getInstance().evaluatePopulation();
-        Result best_result = new Result();
-        Architecture best_arch;
-        for(Result res:ArchitectureEvaluator.getInstance().getResults()) {
-            if(res.getScience() > best_result.getScience()) {
-                best_result = res;
-            }
-        }
-        best_arch = best_result.getArch();
-        //System.out.println("bestNeighbor");
-        return best_arch;
+        return neighbors;
     }
     public Architecture askUserToImprove() {
         //System.out.println("askUserToImprove");

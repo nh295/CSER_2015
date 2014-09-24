@@ -26,8 +26,8 @@ import rbsa.eoss.Result;
  * @author nozomihitomi
  */
 public class ModifyAgent extends DesignAgent{
-    ModifyMode modMode;
-    ManagerMode manMode;
+    private final ModifyMode modMode;
+    private final ManagerMode manMode;
     
     public ModifyAgent(ModifyMode modMode, ManagerMode manMode){
         this.modMode = modMode;
@@ -41,7 +41,6 @@ public class ModifyAgent extends DesignAgent{
         BESTNEIGHBOR,ASKUSER
     }
 
-    
     @Override
     protected void activate() {
 //        setLogLevel(Level.FINEST);
@@ -111,16 +110,34 @@ public class ModifyAgent extends DesignAgent{
                 }
             }
             
-            //evaluate all architectures that have been created and send to evaluatedBuffer.
-            //Also send a message to manager to keep count of evaluations
-            Iterator<Architecture> iter = modifiedArch.iterator();
-            while(iter.hasNext()){
-                Result res =  evaluate(iter.next());
-                sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,res,modifier);
-                sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(modMode.toString()));                
-                if(manMode==ManagerMode.DMABBANDIT){
-                    AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
-                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(data));
+            if(modMode==ModifyMode.BESTNEIGHBOR){ 
+                Architecture best_arch;
+                Result best_result = new Result(null, -1,-1,-1);
+                for(Architecture neighbor:modifiedArch){
+                    Result res = evaluate(neighbor);
+                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(modMode.toString())); 
+                    if(res.getScience() > best_result.getScience()) {
+                    best_result = res;
+                    }
+                }
+                best_arch = best_result.getArch();
+                if(best_arch!=null)
+                    sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,best_arch.getResult(),modifier);
+                else
+                    logger.info("No good neighbors");
+            }else{
+            
+                //evaluate all architectures that have been created and send to evaluatedBuffer.
+                //Also send a message to manager to keep count of evaluations
+                Iterator<Architecture> iter = modifiedArch.iterator();
+                while(iter.hasNext()){
+                    Result res =  evaluate(iter.next());
+                    sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,res,modifier);
+                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(modMode.toString()));                
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
+                        sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(data));
+                    }
                 }
             }
             
@@ -131,13 +148,14 @@ public class ModifyAgent extends DesignAgent{
     @Override
     protected void end(){
         System.out.println("Modifier dying");
-        if(!endLive)
-            throw new IllegalStateException(this.modMode+" agent died but wasn't supposed to");
+        if(!endLive){
+            System.out.println(this.modMode+" agent died but wasn't supposed to");
+            System.exit(1);
+        }
     }
     
     private Result evaluate(Architecture arch){
-        ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
-        return AE.evaluateArchitecture(arch,"Slow");
+        return ArchitectureEvaluator.getInstance().evaluateArchitecture(arch, "Slow");
     }
     
     /**
@@ -176,10 +194,7 @@ public class ModifyAgent extends DesignAgent{
         return out;
     }
     private Collection<Architecture> bestNeighbor(Architecture orig){
-        Architecture modifiedArch = orig.bestNeighbor();
-        Collection<Architecture> out = new ArrayList<>();
-        out.add(modifiedArch);
-        return out;
+        return orig.bestNeighbor();
     }
     private Collection<Architecture> removeSuperfluous(Architecture orig){
         Architecture modifiedArch = orig.removeSuperfluous();
