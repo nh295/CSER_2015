@@ -17,9 +17,11 @@ import madkitdemo3.ModifyAgent.ModifyMode;
  * @author Nozomi
  */
 public class MultiAgentArms {
-    private HashMap<String,AgentArm> arms = new HashMap();
+    private static HashMap<String,AgentArm> arms = new HashMap();
+    private static MultiAgentArms armsData;
+    private static boolean ready;
     
-    public MultiAgentArms(Collection<ModifyMode> modes,double delta, double lambda,int window){
+    private MultiAgentArms(Collection<ModifyMode> modes,double delta, double lambda,int window){
         Iterator<ModifyMode> modeIter = modes.iterator();
         
         while(modeIter.hasNext()){
@@ -28,7 +30,15 @@ public class MultiAgentArms {
         }
     }
     
-    public boolean updateArm(ModifyMode arm,AgentArmCredit data){
+    public static void init(Collection<ModifyMode> modes,double delta, double lambda,int window){
+        armsData = new MultiAgentArms(modes,delta,lambda,window);
+    }
+    
+    public static MultiAgentArms getInstance(){
+        return armsData;
+    }
+    
+    public static boolean updateArm(ModifyMode arm,AgentArmCredit data){
         boolean reset = arms.get(arm.toString()).updateArm(data);
         if(reset){
             System.out.println(arm.toString() + " triggered PH test. Reseting all arms");
@@ -42,11 +52,19 @@ public class MultiAgentArms {
         return false;
     }
     
-    public double getAvgExtremeValues(ModifyMode arm){
+    public static double getAvgExtremeValues(ModifyMode arm){
         return arms.get(arm.toString()).getAvgExtremeReward();
     }
     
-    public double getPlayCount(ModifyMode arm){
+    public static double getPlayCount(ModifyMode arm){
         return arms.get(arm.toString()).getPlayCount();
+    }
+    
+    public static boolean isReady(){
+        return ready;
+    }
+    
+    public static void setReady(boolean ready){
+        MultiAgentArms.ready = ready;
     }
 }

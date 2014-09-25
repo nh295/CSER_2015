@@ -7,11 +7,15 @@
 package madkitdemo3;
 
 
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import static java.lang.Double.NaN;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -31,6 +35,7 @@ import rbsa.eoss.Architecture;
 import rbsa.eoss.ArchitectureEvaluator;
 import rbsa.eoss.ArchitectureGenerator;
 import rbsa.eoss.Result;
+import rbsa.eoss.local.Params;
 
 
 /**
@@ -39,13 +44,12 @@ import rbsa.eoss.Result;
  */
 public class DMABManager extends DesignAgent{
     private final int c = 5; //scaling between exploitation and exploration
-    private MultiAgentArms arms; 
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
-    private final int populationSize = 200;
+    private final int populationSize = 100;
     private Random rand = new Random();
+    private ArrayList<ModifyMode> selectionHistory = new ArrayList<>();
     
-   private int timestep;
     
     @Override
     protected void activate() {
@@ -73,9 +77,7 @@ public class DMABManager extends DesignAgent{
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
-        arms = new MultiAgentArms(modes,0.2,0.2,10);
-        
-       timestep = 0;
+        MultiAgentArms.init(modes,0.2,0.2,10);
     }
         
     @Override
@@ -98,34 +100,24 @@ public class DMABManager extends DesignAgent{
         
         while(!isDone(AgentEvaluationCounter.getTotalEvals())){
             ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
+            selectionHistory.add(modMode);
+            MultiAgentArms.setReady(false);
             
             try {
                 launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            Message mail = waitNextMessage();
-            switch(mail.getSender().getRole()){
-                case modifier:
-                    Object content = ((ObjectMessage)mail).getContent();
-                    ArrayList<AgentArmCredit> dataArray=new ArrayList();
-                    if(content.getClass().equals(AgentArmCredit.class)){
-                        AgentArmCredit data = ((ObjectMessage<AgentArmCredit>)mail).getContent();
-                        arms.updateArm(modMode,data);
-                    }else if(content.getClass().equals(ArrayList.class))
-                         dataArray = ((ObjectMessage<ArrayList<AgentArmCredit>>)mail).getContent();
-                         for(AgentArmCredit credit:dataArray){
-                             arms.updateArm(modMode,credit);
-                         }
-                    break;
-                default: logger.warning("unsupported sender: " + mail.getSender().getRole());
+            while(!MultiAgentArms.isReady()){
+                pause(1);
+                //do nothing
             }
-            timestep++;
         }
         
         System.out.println("Done");
         System.out.println(AgentEvaluationCounter.getHashMap());
+        AgentEvaluationCounter.saveAgentStats();
+        saveSelectionHistory();
     }
         
     @Override
@@ -152,16 +144,18 @@ public class DMABManager extends DesignAgent{
         double val = 0;
         double max = 0;
         double totalPlayCount = totalPlays;
-        if(totalPlayCount == 0)
-            totalPlayCount = 1;
+        if(totalPlayCount == 0 || totalPlayCount==1)
+            totalPlayCount = 1.000001;
         for(ModifyMode mode:ModifyMode.values()){
-            double p = arms.getAvgExtremeValues(mode);
-            if(Double.isNaN(p))
-                p=0;
-            val = p+c*Math.sqrt(Math.log10(totalPlayCount)/arms.getPlayCount(mode));
-            scores.put(mode, val);
-            if(val>=max){
-                max = val;
+            if(mode!=ModifyMode.ASKUSER){
+                double p = MultiAgentArms.getAvgExtremeValues(mode);
+                if(Double.isNaN(p))
+                    p=0;
+                val = p+c*Math.sqrt(Math.log10(totalPlayCount)/MultiAgentArms.getPlayCount(mode));
+                scores.put(mode, val);
+                if(val>=max){
+                    max = val;
+                }
             }
         }
         for(ModifyMode mode:ModifyMode.values()){
@@ -171,6 +165,10 @@ public class DMABManager extends DesignAgent{
                 potentialModes.add(mode);
             }
         }
+        
+        if(potentialModes.isEmpty())
+            pause(10);
+        
         //returns a random mode if there are multiple modes that maximize function
         return potentialModes.get(rand.nextInt(potentialModes.size()));
     }
@@ -230,6 +228,22 @@ public class DMABManager extends DesignAgent{
         while(i.hasNext()){
             DesignAgent agentToKill = (DesignAgent)i.next();
             agentToKill.suicide();
+        }
+    }
+    
+    public void saveSelectionHistory(){
+        try {
+            String name = "DMABHistory";
+            SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd--HH-mm-ss" );
+            String stamp = dateFormat.format( new Date() );
+            String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";
+            FileOutputStream file = new FileOutputStream( file_path );
+            ObjectOutputStream os = new ObjectOutputStream( file );
+            os.writeObject(selectionHistory);
+            os.close();
+            file.close();
+        } catch (Exception e) {
+            System.out.println( e.getMessage() );
         }
     }
 

@@ -86,4 +86,8 @@ public final class ArchPopulation {
         }
         return copyPop;
     }
+    
+    public Architecture get(int n){
+        return population.get(n);
+    }
 }

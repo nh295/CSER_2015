@@ -22,6 +22,7 @@ import rbsa.eoss.ResultManager;
 import rbsa.eoss.SearchPerformance;
 import rbsa.eoss.SearchPerformanceComparator;
 import rbsa.eoss.SearchPerformanceManager;
+import rbsa.eoss.local.Params;
 
 /**
  *
@@ -157,51 +158,52 @@ public class ArchSorter extends DesignAgent{
         return new ArchPopulation(newPopList);
     }
     
-    private HashMap<Integer,ArrayList<Architecture>> nonDominatedSorting(ArchPopulation pop, boolean compute_all_fronts) {
-        List<Architecture>archList =  pop.asList();
-        HashMap<Integer,ArrayList<Architecture>> fronts = new HashMap<>();//archs in front i
-        HashMap<Architecture,ArrayList<Integer>> dominates = new HashMap<>();//indexes of archs that arch dominates
-        int[] dominationCounters = new int[archList.size()];//number of archs that dominate arch i
+    public HashMap<Integer,ArrayList<Architecture>> nonDominatedSorting(ArchPopulation currentPopulation,boolean compute_all_fronts) {
+
+        HashMap<Integer,ArrayList<Architecture>> fronts = new HashMap<Integer,ArrayList<Architecture>>();//archs in front i
+        HashMap<Architecture,ArrayList<Integer>> dominates = new HashMap<Architecture,ArrayList<Integer>>();//indexes of archs that arch dominates
+        int[] dominationCounters = new int[currentPopulation.getSize()];//number of archs that dominate arch i
         for (int i = 0;i<dominationCounters.length;i++)
             dominationCounters[i] = 0;
         
-        for (int i = 0;i<archList.size();i++) {
-            Architecture a1 = archList.get(i);
-            for (int j = 0;j<archList.size();j++) {
-                Architecture a2 = archList.get(j);
-                int r1domr2 = archDominates(a1,a2);
+        for (int i = 0;i<currentPopulation.getSize();i++) {
+            Architecture a1 = currentPopulation.get(i);
+            Result r1 = a1.getResult();
+            for (int j = 0;j<currentPopulation.getSize();j++) {
+                Architecture a2 = currentPopulation.get(j);
+                Result r2 = a2.getResult();
+                int r1domr2 = dominates(r1,r2);
                 if(r1domr2==1) {//if a1 dominates a2
                     ArrayList<Integer> existing = dominates.get(a1);
                     if(existing == null)
-                        existing = new ArrayList<>();
+                        existing = new ArrayList<Integer>();
                     existing.add(j);//add j to indexes of archs that arch a1 dominates
                     dominates.put(a1,existing);
-                } else if(r1domr2==-1) {//if a2 dominates a1
+                } else if(r1domr2==-1) {
                     dominationCounters[i]++;//increment counter of archs that dominate a1
                 }
             }
             if(dominationCounters[i]==0) {//no one dominates arch i
                 ArrayList<Architecture> existing = fronts.get(1);
                 if(existing == null)
-                    existing = new ArrayList<>();
+                    existing = new ArrayList<Architecture>();
                 existing.add(a1);
                 //System.out.println("Arch " + i + " added to Front 1");
-                fronts.put(1,existing);//add a1 to first front. Index of first front is 1 not 0
+                fronts.put(1,existing);//add a1 to first front
             }
         }
-       
         if(!compute_all_fronts)
             return fronts;
         int i = 1;
-        
-        while(!fronts.get(i).isEmpty()) {
-            ArrayList<Architecture> nextFront = new ArrayList<>();
+        ArrayList<Architecture> nextFront = fronts.get(i);
+        while(!nextFront.isEmpty()) {
+            nextFront = new ArrayList<Architecture>();
             for (int j = 0;j<fronts.get(i).size();j++) {//iterate over archs of front i
                 Architecture a1 = fronts.get(i).get(j);//arch j of front i
                 ArrayList<Integer> doms = dominates.get(a1);//set of solutions dominated by a1
                 if (doms!=null)  {
                     for (int k = 0;k<doms.size();k++) {
-                        Architecture a2 = archList.get(doms.get(k));
+                        Architecture a2 = currentPopulation.get(doms.get(k));
                         dominationCounters[doms.get(k)]--;//decrease domination counter of arch a2 since a1 is removed from tradespace
                         if( dominationCounters[doms.get(k)] <= 0) {
                             nextFront.add(a2);
@@ -211,42 +213,57 @@ public class ArchSorter extends DesignAgent{
                 }
             }
             i++;
-            fronts.put(i,nextFront);
+            if (!nextFront.isEmpty())
+                fronts.put(i,nextFront);
         }
         return fronts;
     }
     
-    private int archDominates(Architecture a1,Architecture a2) {
-        double x1 = a1.getResult().getScience()- a2.getResult().getScience();
-        double x2 = a1.getResult().getCost() - a2.getResult().getCost();
+    public int dominates(Result r1,Result r2) {
+        // Feasibility before fitness
+        if (r1.getArch().isFeasibleAssignment() && !r2.getArch().isFeasibleAssignment())
+            return 1;
+        if (!r1.getArch().isFeasibleAssignment() && r2.getArch().isFeasibleAssignment())
+            return -1;
+        if (!r1.getArch().isFeasibleAssignment() && !r2.getArch().isFeasibleAssignment())
+            if(r1.getArch().getTotalInstruments() < r2.getArch().getTotalInstruments())
+                return 1;
+            else if(r1.getArch().getTotalInstruments() > r2.getArch().getTotalInstruments()) 
+                return -1;
+            else //Both are infeasible, and both to teh same degree (i.e., both have the same number of total instruments)
+                return 0;
+        
+        //Both feasible ==> Sorting by fitness
+        double x1 = r1.getScience() - r2.getScience();
+        double x2 = r1.getCost() - r2.getCost();
         if((x1>=0 && x2<=0) && !(x1==0 && x2==0)) 
-            return 1; //a1 dominates a2
+            return 1;
         else if((x1<=0 && x2>=0) && !(x1==0 && x2==0))
-            return -1; //a2 dominates a1
-        else return 0; //neither architecture dominates the other
-    }
+            return -1;
+        else return 0;
+    } 
     
-    private void computeCrowdingDistance(ArrayList<Architecture> front)
-    {
+    public void computeCrowdingDistance(ArrayList<Architecture> front) {
+        
         int nsol = front.size();
 
         //Science
         Collections.sort(front,Architecture.ArchScienceComparator);
-        front.get(0).getResult().setCrowdingDistance(1000.0);
-        front.get(front.size()-1).getResult().setCrowdingDistance(1000.0);
+        front.get(0).getResult().setCrowdingDistance(1000);
+        front.get(front.size()-1).getResult().setCrowdingDistance(1000);
         for (int i = 1;i<nsol-1;i++) 
             front.get(i).getResult().setCrowdingDistance(
                     front.get(i).getResult().getCrowdingDistance() + Math.abs(
-                    (front.get(i+1).getResult().getScience()- front.get(i-1).getResult().getScience())/(5-0))) ;
+                    (front.get(i+1).getResult().getScience() - front.get(i-1).getResult().getScience())/(Params.max_science-Params.min_science))) ;
         
         //Cost
         Collections.sort(front,Architecture.ArchCostComparator);
-        front.get(0).getResult().setCrowdingDistance(1000.0);
-        front.get(front.size()-1).getResult().setCrowdingDistance(1000.0);
+        front.get(0).getResult().setCrowdingDistance(1000);
+        front.get(front.size()-1).getResult().setCrowdingDistance(1000);
         for (int i = 1;i<nsol-1;i++) 
             front.get(i).getResult().setCrowdingDistance(
                     front.get(i).getResult().getCrowdingDistance() + Math.abs(
-                    (front.get(i+1).getResult().getCost() - front.get(i-1).getResult().getCost())/(23675-0))) ;
+                    (front.get(i+1).getResult().getCost() - front.get(i-1).getResult().getCost())/(Params.max_cost-Params.min_cost))) ;
     }
     
     /**

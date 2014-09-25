@@ -129,7 +129,8 @@ public class AgentArm {
                 
         resultList.add(data.getNewRes());
         
-        return((maxDev - avgDev)>lambda);
+//        return((maxDev - avgDev)>lambda);
+        return false;
     }
     
     private int computeHammingDist(Result origRes, Result newRes){        

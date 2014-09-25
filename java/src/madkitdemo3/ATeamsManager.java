@@ -123,7 +123,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 210;
+        int evals = 10000;
     return n>=evals;
     }
     
