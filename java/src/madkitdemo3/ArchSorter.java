@@ -34,7 +34,7 @@ public class ArchSorter extends DesignAgent{
     // sent to their respective buffers
     
     private ArchPopulation currentPopulation;
-    private final int fuzzyParetoArchsWanted = 400;
+    private final int fuzzyParetoArchsWanted = 200;
     private static SearchPerformance sp;
     private SearchPerformanceManager spm;
     private int iteration = 0;
@@ -78,7 +78,7 @@ public class ArchSorter extends DesignAgent{
                     ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
                     
                     sendReply(mail,fuzzyParetoArchMessage);
-                    sendMessage(tradespaceAddress,new Message()); //get tradespace to plot after every sort
+                    sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
                     
                     RM.saveResultCollection(new ResultCollection(results2Save));
         

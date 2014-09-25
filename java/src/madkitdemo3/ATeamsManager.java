@@ -68,7 +68,7 @@ public class ATeamsManager extends DesignAgent{
     @Override
     protected void live() {
 
-        int n = 0;
+        AgentEvaluationCounter.getInstance();
         
         //initiate population and send to unevaluated buffer
         ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
@@ -101,24 +101,11 @@ public class ATeamsManager extends DesignAgent{
         }
         logger.info("All agents initiated. Starting search...");
         
-        HashMap<String,Integer> agentEval = new HashMap();
-        while(!isDone(n)){            
-            Message mail = waitNextMessage();
-            switch(mail.getSender().getRole()){
-                case modifier: 
-                    //to keep count of evaluations
-                    String agent = (String)((ObjectMessage)mail).getContent();
-                    if(agentEval.containsKey(agent))
-                        agentEval.put(agent,agentEval.get(agent)+1);
-                    else
-                        agentEval.put(agent, 1);
-                    n++;
-                    break;
-                default: logger.warning("unsupported senderp: " + mail.getSender().getRole());
-            }
+        while(!isDone(AgentEvaluationCounter.getTotalEvals())){
         }
         System.out.println("Done");
-        System.out.println(agentEval);
+        System.out.println(AgentEvaluationCounter.getHashMap());
+        AgentEvaluationCounter.saveAgentStats();
     }
         
     @Override
@@ -126,7 +113,7 @@ public class ATeamsManager extends DesignAgent{
         killAgentsInList(searchAgents);
         killAgentsInList(bufferAgents);
         killAgentsInList(ancillaryAgents);
-        
+              
         AbstractAgent.ReturnCode returnCode = leaveRole(COMMUNITY, aDesignTeam, manager);
         if (returnCode == AbstractAgent.ReturnCode.SUCCESS){
             if(logger != null){
@@ -136,8 +123,8 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int iters = 20000;
-    return n>=iters;
+        int evals = 210;
+    return n>=evals;
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){

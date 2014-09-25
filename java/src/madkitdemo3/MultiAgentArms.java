@@ -28,7 +28,7 @@ public class MultiAgentArms {
         }
     }
     
-    public void updateArm(ModifyMode arm,AgentArmCredit data){
+    public boolean updateArm(ModifyMode arm,AgentArmCredit data){
         boolean reset = arms.get(arm.toString()).updateArm(data);
         if(reset){
             System.out.println(arm.toString() + " triggered PH test. Reseting all arms");
@@ -37,7 +37,9 @@ public class MultiAgentArms {
             while(iter.hasNext()){
                 arms.get(iter.next()).reset();
             }
+            return true;
         }
+        return false;
     }
     
     public double getAvgExtremeValues(ModifyMode arm){
@@ -45,6 +47,6 @@ public class MultiAgentArms {
     }
     
     public double getPlayCount(ModifyMode arm){
-        return arms.get(arms.toString()).getPlayCount();
+        return arms.get(arm.toString()).getPlayCount();
     }
 }

@@ -7,6 +7,7 @@
 package madkitdemo3;
 
 
+import static java.lang.Double.NaN;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -36,12 +38,12 @@ import rbsa.eoss.Result;
  * @author nozomihitomi
  */
 public class DMABManager extends DesignAgent{
-    private final int w = 5; //size of register that keeps improvement values
     private final int c = 5; //scaling between exploitation and exploration
     private MultiAgentArms arms; 
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
-    private final int populationSize = 5;
+    private final int populationSize = 200;
+    private Random rand = new Random();
     
    private int timestep;
     
@@ -78,11 +80,10 @@ public class DMABManager extends DesignAgent{
         
     @Override
     protected void live() {
-
-        int n = 0;
+        AgentEvaluationCounter.getInstance();
         
         //initiate population and send to unevaluated buffer
-        ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().generateRandomPopulation(populationSize);
+        ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         AE.setPopulation(initPop);
         AE.evaluatePopulation();
@@ -94,8 +95,9 @@ public class DMABManager extends DesignAgent{
             sendMessageWithRole(evalBufferAddress,message,manager);
         }
         
-        while(!isDone(n)){
-            ModifyMode modMode = selectOperator(n);
+        
+        while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+            ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
             
             try {
                 launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
@@ -105,17 +107,25 @@ public class DMABManager extends DesignAgent{
             
             Message mail = waitNextMessage();
             switch(mail.getSender().getRole()){
-                case modifier: 
-                    AgentArmCredit data = ((ObjectMessage<AgentArmCredit>)mail).getContent();
-                    arms.updateArm(modMode,data);
-                    
-                    //to keep count of evaluations
-                    n++;
+                case modifier:
+                    Object content = ((ObjectMessage)mail).getContent();
+                    ArrayList<AgentArmCredit> dataArray=new ArrayList();
+                    if(content.getClass().equals(AgentArmCredit.class)){
+                        AgentArmCredit data = ((ObjectMessage<AgentArmCredit>)mail).getContent();
+                        arms.updateArm(modMode,data);
+                    }else if(content.getClass().equals(ArrayList.class))
+                         dataArray = ((ObjectMessage<ArrayList<AgentArmCredit>>)mail).getContent();
+                         for(AgentArmCredit credit:dataArray){
+                             arms.updateArm(modMode,credit);
+                         }
                     break;
-                default: logger.warning("unsupported senderp: " + mail.getSender().getRole());
+                default: logger.warning("unsupported sender: " + mail.getSender().getRole());
             }
             timestep++;
         }
+        
+        System.out.println("Done");
+        System.out.println(AgentEvaluationCounter.getHashMap());
     }
         
     @Override
@@ -137,17 +147,32 @@ public class DMABManager extends DesignAgent{
     }
     
     private ModifyMode selectOperator(int totalPlays){
-        ModifyMode modMode = null;
+        ArrayList<ModifyMode> potentialModes = new ArrayList();
+        HashMap<ModifyMode,Double> scores = new HashMap();
         double val = 0;
         double max = 0;
+        double totalPlayCount = totalPlays;
+        if(totalPlayCount == 0)
+            totalPlayCount = 1;
         for(ModifyMode mode:ModifyMode.values()){
-            val = arms.getAvgExtremeValues(mode)+c*Math.sqrt(Math.log10(totalPlays)/arms.getPlayCount(mode));
-            if(val>max){
+            double p = arms.getAvgExtremeValues(mode);
+            if(Double.isNaN(p))
+                p=0;
+            val = p+c*Math.sqrt(Math.log10(totalPlayCount)/arms.getPlayCount(mode));
+            scores.put(mode, val);
+            if(val>=max){
                 max = val;
-                modMode = mode;
             }
         }
-        return modMode;
+        for(ModifyMode mode:ModifyMode.values()){
+            if(mode==ModifyMode.ASKUSER)
+                break;
+            if(scores.get(mode)==max){
+                potentialModes.add(mode);
+            }
+        }
+        //returns a random mode if there are multiple modes that maximize function
+        return potentialModes.get(rand.nextInt(potentialModes.size()));
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){

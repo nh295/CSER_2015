@@ -91,40 +91,56 @@ public class ModifyAgent extends DesignAgent{
             //k-arm bandit mode allows only one eval
             if(manMode==ManagerMode.DMABBANDIT){
                 suicide(); //flag to terminate after this iteration
-                ref = unmodifiedArch;
+            }
+            
+            ref = unmodifiedArch;
                 //used for assigning credits to operators
-                if(unmodifiedArch2!=null){
-                    int test = unmodifiedArch.getResult().dominates(unmodifiedArch2.getResult());
-                    switch(test){
-                        case -1:
-                            break;
-                        case 0: Random rand = new Random(); //if neither dominates, choose a random parent as ref
+            if(unmodifiedArch2!=null){
+                int test = unmodifiedArch.getResult().dominates(unmodifiedArch2.getResult());
+                switch(test){
+                    case -1:
+                    break;
+                    case 0: Random rand = new Random(); //if neither dominates, choose a random parent as ref
                         if(rand.nextBoolean())
                             ref = unmodifiedArch2;
-                        break;
-                        case 1: ref = unmodifiedArch2;
-                        break;
-                        default: System.out.println("Something is wrong. Results.dominate didn't return a -1,0, or 1");
-                        break;
-                    }
+                    break;
+                    case 1: ref = unmodifiedArch2;
+                    break;
+                    default: System.out.println("Something is wrong. Results.dominate didn't return a -1,0, or 1");
+                    break;
                 }
             }
             
             if(modMode==ModifyMode.BESTNEIGHBOR){ 
                 Architecture best_arch;
                 Result best_result = new Result(null, -1,-1,-1);
+                ArrayList<AgentArmCredit> credits = new ArrayList();
                 for(Architecture neighbor:modifiedArch){
                     Result res = evaluate(neighbor);
-                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(modMode.toString())); 
+                    AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
+                        credits.add(data);
+                    }
                     if(res.getScience() > best_result.getScience()) {
-                    best_result = res;
+                        best_result = res;
                     }
                 }
                 best_arch = best_result.getArch();
-                if(best_arch!=null)
+                if(best_arch!=null){
                     sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,best_arch.getResult(),modifier);
-                else
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(credits));
+                    }
+                }
+                else{
                     logger.info("No good neighbors");
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),ref.getResult());
+                        sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(data));
+                    }
+                }
+                    
             }else{
             
                 //evaluate all architectures that have been created and send to evaluatedBuffer.
@@ -133,15 +149,13 @@ public class ModifyAgent extends DesignAgent{
                 while(iter.hasNext()){
                     Result res =  evaluate(iter.next());
                     sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,res,modifier);
-                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(modMode.toString()));                
+                    AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);        
                     if(manMode==ManagerMode.DMABBANDIT){
                         AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
                         sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new ObjectMessage(data));
                     }
                 }
             }
-            
-            
         }
     }
     

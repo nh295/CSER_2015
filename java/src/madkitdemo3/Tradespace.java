@@ -45,12 +45,10 @@ public class Tradespace extends DesignAgent{
             Message mail = waitNextMessage();
             switch(mail.getSender().getRole()){
                 case archSorter:
-                    plotChart();
-//                    logger.info("plotting tradespace");
-                    break;
-                case fuzzyParetoBuffer:
                     ObjectMessage paretoMessage = (ObjectMessage)mail;
                     updatePareto((ArchPopulation)paretoMessage.getContent());
+                    plotChart();
+//                    logger.info("plotting tradespace");
                     break;
                 default: logger.warning("unknown sender");
             }

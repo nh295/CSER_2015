@@ -19,11 +19,11 @@ public class AgentArm {
     private static int maxDiversity=0;
     private static double maxQuality=0;
 
-    private int playCount;
+    private double playCount;
     private double avgReward;
     private double avgDev;
-    private LinkedList<Double> extremeValue;
-    private LinkedList<Result> resultList;
+    private LinkedList<Double> extremeValue = new LinkedList<>();
+    private LinkedList<Result> resultList = new LinkedList<>();
     private double maxDev;
     private int solutionDiversity;
     
@@ -56,7 +56,7 @@ public class AgentArm {
         AgentArm.maxQuality = maxQuality;
     }
     
-    public int getPlayCount(){
+    public double getPlayCount(){
         return playCount;
     }
     
@@ -145,7 +145,7 @@ public class AgentArm {
     }
     
     public final void reset(){
-        playCount = 0;
+        playCount = 0.0001;
         avgReward = 0;
         avgDev = 0;
         maxDev =0;

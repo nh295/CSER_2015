@@ -267,7 +267,7 @@ public class RBSAEOSSSMAP {
                 new Madkit("--launchAgents",ATeamsManager.class.getName() + ",true,1;");
                 break;
             case 11: // madkit agent based K Arm Bandit Mode
-                params = new Params( path, "CRISP-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
                 AE.init(11);
                 new Madkit("--launchAgents",DMABManager.class.getName() + ",true,1;");
                 break;
