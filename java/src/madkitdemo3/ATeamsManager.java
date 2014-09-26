@@ -50,11 +50,9 @@ public class ATeamsManager extends DesignAgent{
         requestRole(COMMUNITY, aDesignTeam, manager);
        
         
-        // initialize buffer agents
-        bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
+        
         
         ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
-        ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 
         
                 
         //set all agents to have sendProb of 1.0
@@ -67,7 +65,11 @@ public class ATeamsManager extends DesignAgent{
         
     @Override
     protected void live() {
-
+        
+        for(int i=0;i<20;i++){
+            // initialize buffer agents
+            bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
+            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 
         AgentEvaluationCounter.getInstance();
         
         //initiate population and send to unevaluated buffer
@@ -105,14 +107,17 @@ public class ATeamsManager extends DesignAgent{
         }
         System.out.println("Done");
         System.out.println(AgentEvaluationCounter.getHashMap());
-        AgentEvaluationCounter.saveAgentStats();
+        AgentEvaluationCounter.saveAgentStats(i);
+        
+        killAgentsInList(searchAgents);
+        killAgentsInList(bufferAgents);
+        killAgentsInList(ancillaryAgents);
+        
+        }
     }
         
     @Override
     protected void end(){
-        killAgentsInList(searchAgents);
-        killAgentsInList(bufferAgents);
-        killAgentsInList(ancillaryAgents);
               
         AbstractAgent.ReturnCode returnCode = leaveRole(COMMUNITY, aDesignTeam, manager);
         if (returnCode == AbstractAgent.ReturnCode.SUCCESS){
@@ -123,7 +128,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 10000;
+        int evals = 2000;
     return n>=evals;
     }
     

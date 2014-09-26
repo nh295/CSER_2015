@@ -27,10 +27,11 @@ public class AgentEvaluationCounter {
     private static AgentEvaluationCounter AEC = null;
     private static HashMap<ModifyMode,Integer> agentEvals;
     private static HashMap<ModifyMode,ArrayList<Integer>> dominanceHistory;
-    private static int totalEval =0;
+    private static int totalEval;
     private AgentEvaluationCounter(){
         agentEvals = new HashMap();
         dominanceHistory =  new HashMap();
+        totalEval = 0;
     }
     
     public static AgentEvaluationCounter getInstance(){
@@ -63,9 +64,9 @@ public class AgentEvaluationCounter {
         return agentEvals;
     }
     
-    public static void saveAgentStats(){
+    public static void saveAgentStats(int i){
         try {
-            String name = "stat";
+            String name = "stat" + i;
             SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd--HH-mm-ss" );
             String stamp = dateFormat.format( new Date() );
             String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";
@@ -96,5 +97,9 @@ public class AgentEvaluationCounter {
             System.out.println( e.getMessage() );
             return null;
         }
+    }
+    
+    public static void resetCounter(){
+        AEC = new AgentEvaluationCounter();
     }
 }

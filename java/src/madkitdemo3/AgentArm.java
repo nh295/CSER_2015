@@ -85,15 +85,6 @@ public class AgentArm {
         }
         return max;
     }
-    
-    public double getAvgExtremeReward(){
-        double avg = 0;
-        for (Double extremeValue1 : extremeValue) {
-            avg+=extremeValue1;
-        }
-        return avg/extremeValue.size();
-    }
-
     public int getSolutionDiversity() {
         return solutionDiversity/getMaxDiversity();
     }
@@ -129,8 +120,7 @@ public class AgentArm {
                 
         resultList.add(data.getNewRes());
         
-//        return((maxDev - avgDev)>lambda);
-        return false;
+        return((maxDev - avgDev)>lambda);
     }
     
     private int computeHammingDist(Result origRes, Result newRes){        

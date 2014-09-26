@@ -9,10 +9,41 @@ import rbsa.eoss.local.*
 import madkitdemo3.*
 import java.io.*;
 
-AEC = AgentEvaluationCounter.getInstance();
-stats = AEC.loadAgentStatFromFile('C:\Users\SEAK1\Nozomi\CSER_2015\results\stat_2014-09-25--17-28-04.rs');
 
-keys = stats.keySet();
+% file = FileInputStream('C:\Users\SEAK1\Nozomi\CSER_2015\results\DMABHistory_2014-09-25--01-59-46.rs' );
+% is = ObjectInputStream( file );
+% history = is.readObject();
+% is.close();
+% file.close();
+% selectionHistory = history;
+
+
+
+
+hist = madkitdemo3.DMABManager.getInstance.loadAgentStatFromFile('C:\Users\SEAK1\Nozomi\CSER_2015\results\DMABHistory_2014-09-25--12-55-24.rs');
+
+iter = madkitdemo3.ModifyMode.values.iterator;
+numAgents = iter.size();
+labels = cell(numAgents,1);
+i=1;
+while(iter.hasNext())
+    key = iter.next();
+    labels{i}=strcat(char(key),' (',num2str(hist.get(key).size()),')');
+    i=i+1;
+end
+
+iter = hist.iterator();
+agentHistory = cell(hist.size(),numAgents);
+i=1;
+while(iter.hasNext())
+    name = iter.next();
+    if(name==ModifyMode)
+    end
+end
+
+
+
+keys = hist.keySet();
 iter = keys.iterator();
 
 numAgents = keys.size();
@@ -22,7 +53,7 @@ i=1;
 while(iter.hasNext())
     name = iter.next();
     agent_names{i}=char(name);
-    javaArray = stats.get(name);
+    javaArray = hist.get(name);
     arrayIter = javaArray.iterator;
     array = zeros(javaArray.size(),1);
     j=1;
@@ -42,17 +73,6 @@ pattern = {'-b','-g','-r','-c','-m','-k',...
 for(i=1:length(data))
     plot(data{i},pattern{i});
 end
-
-iter = keys.iterator();
-labels = cell(numAgents,1);
-i=1;
-while(iter.hasNext())
-    key = iter.next();
-    labels{i}=strcat(char(key),' (',num2str(stats.get(key).size()),')');
-    i=i+1;
-end
-legend(labels);
-
 %plot on subplot
 figure(2);
 for(i=1:length(data))

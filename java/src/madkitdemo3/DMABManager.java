@@ -7,7 +7,9 @@
 package madkitdemo3;
 
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import static java.lang.Double.NaN;
 import java.lang.reflect.Constructor;
@@ -46,9 +48,21 @@ public class DMABManager extends DesignAgent{
     private final int c = 5; //scaling between exploitation and exploration
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
-    private final int populationSize = 100;
+    private final int populationSize = 200;
     private Random rand = new Random();
-    private ArrayList<ModifyMode> selectionHistory = new ArrayList<>();
+    private static ArrayList<ModifyMode> selectionHistory = new ArrayList<>();
+    private static DMABManager dManager;
+    
+    public DMABManager(){
+        
+    }
+    
+    public static DMABManager getInstance(){
+        if(dManager==null){
+            dManager = new DMABManager();
+        }
+        return dManager;
+    }
     
     
     @Override
@@ -77,7 +91,7 @@ public class DMABManager extends DesignAgent{
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
-        MultiAgentArms.init(modes,0.2,0.2,10);
+        MultiAgentArms.init(modes,0.3,1,10);
     }
         
     @Override
@@ -116,7 +130,7 @@ public class DMABManager extends DesignAgent{
         
         System.out.println("Done");
         System.out.println(AgentEvaluationCounter.getHashMap());
-        AgentEvaluationCounter.saveAgentStats();
+        AgentEvaluationCounter.saveAgentStats(1);
         saveSelectionHistory();
     }
         
@@ -148,7 +162,7 @@ public class DMABManager extends DesignAgent{
             totalPlayCount = 1.000001;
         for(ModifyMode mode:ModifyMode.values()){
             if(mode!=ModifyMode.ASKUSER){
-                double p = MultiAgentArms.getAvgExtremeValues(mode);
+                double p = MultiAgentArms.getAvgValues(mode);
                 if(Double.isNaN(p))
                     p=0;
                 val = p+c*Math.sqrt(Math.log10(totalPlayCount)/MultiAgentArms.getPlayCount(mode));
@@ -165,9 +179,6 @@ public class DMABManager extends DesignAgent{
                 potentialModes.add(mode);
             }
         }
-        
-        if(potentialModes.isEmpty())
-            pause(10);
         
         //returns a random mode if there are multiple modes that maximize function
         return potentialModes.get(rand.nextInt(potentialModes.size()));
@@ -244,6 +255,25 @@ public class DMABManager extends DesignAgent{
             file.close();
         } catch (Exception e) {
             System.out.println( e.getMessage() );
+        }
+    }
+    
+    public static ArrayList<ModifyMode> loadAgentStatFromFile(String filePath )
+    {
+        ArrayList<ModifyMode> history;
+        
+        try {
+            FileInputStream file = new FileInputStream( filePath );
+            ObjectInputStream is = new ObjectInputStream( file );
+            history = (ArrayList<ModifyMode>)is.readObject();
+            is.close();
+            file.close();
+            selectionHistory = history;
+            return history;
+        } catch (Exception e) {
+            System.out.println( "The stats for agents is not found" );
+            System.out.println( e.getMessage() );
+            return null;
         }
     }
 

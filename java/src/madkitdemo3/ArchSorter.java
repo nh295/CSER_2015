@@ -66,45 +66,47 @@ public class ArchSorter extends DesignAgent{
         AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
-            Message mail = waitNextMessage();
-            switch(mail.getSender().getRole()){
-                case evaluatedBuffer:
-                    currentPopulation.clearPopulation();
-                    currentPopulation = (ArchPopulation)((ObjectMessage)mail).getContent();
+            Message mail = waitNextMessage(100);
+            if(mail!=null){
+                switch(mail.getSender().getRole()){
+                    case evaluatedBuffer:
+                        currentPopulation.clearPopulation();
+                        currentPopulation = (ArchPopulation)((ObjectMessage)mail).getContent();
                     
-                    // Sort out top pareto ranked architecture
-                    fuzzyParetoArchs = selection_NSGA2();
+                        // Sort out top pareto ranked architecture
+                        fuzzyParetoArchs = selection_NSGA2();
                     
-                    //send pareto front to tradespace agent to plot paretoFront
-                    ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
+                        //send pareto front to tradespace agent to plot paretoFront
+                        ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
                     
-                    sendReply(mail,fuzzyParetoArchMessage);
-                    sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
+                        sendReply(mail,fuzzyParetoArchMessage);
+                        sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
                     
-                    RM.saveResultCollection(new ResultCollection(results2Save));
+                        RM.saveResultCollection(new ResultCollection(results2Save));
         
-                    iteration++;
-                    sp.updateSearchPerformance(results2Save, iteration);
-                    SearchPerformance spTemp = new SearchPerformance(sp);
-                    spm.saveSearchPerformance(spTemp);
-                    perfs.add(spTemp);
+                        iteration++;
+                        sp.updateSearchPerformance(results2Save, iteration);
+                        SearchPerformance spTemp = new SearchPerformance(sp);
+                        spm.saveSearchPerformance(spTemp);
+                        perfs.add(spTemp);
         
-                    int best = spTemp.compareTo(bestPerf);
-                    if (best == 1) {
-                        bestPerf = new SearchPerformance(spTemp);
-                    }
+                        int best = spTemp.compareTo(bestPerf);
+                        if (best == 1) {
+                            bestPerf = new SearchPerformance(spTemp);
+                        }
         
-                    SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
-                    spm.saveSearchPerformanceComparator(spc);
-                    break;
-                default: logger.warning("unsupported sender: " + mail.getSender().getRole());
+                        SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
+                        spm.saveSearchPerformanceComparator(spc);
+                        break;
+                    default: logger.warning("unsupported sender: " + mail.getSender().getRole());
+                }
             }
         }
     }
     
     @Override
     protected void end(){
-        
+        System.out.println("ArchSorter dying");
     }
 //    /**
 //     * 

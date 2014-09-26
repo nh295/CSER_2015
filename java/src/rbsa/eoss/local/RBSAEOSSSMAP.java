@@ -47,7 +47,7 @@ public class RBSAEOSSSMAP {
 //        String path = "C:\\Users\\Nozomi\\Documents\\CSER";
         String path = "C:\\Users\\SEAK1\\Nozomi\\CSER_2015";
         
-        int MODE = 11;
+        int MODE = 10;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();

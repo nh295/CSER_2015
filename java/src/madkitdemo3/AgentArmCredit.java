@@ -32,6 +32,6 @@ public class AgentArmCredit {
     }
     
     private double computeReward(Result origRes, Result newRes){
-        return origRes.dominates(newRes);
+        return newRes.dominates(origRes)+1;
     }
 }

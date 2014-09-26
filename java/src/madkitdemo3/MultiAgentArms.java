@@ -52,8 +52,12 @@ public class MultiAgentArms {
         return false;
     }
     
-    public static double getAvgExtremeValues(ModifyMode arm){
-        return arms.get(arm.toString()).getAvgExtremeReward();
+    public static double getMaxExtremeValues(ModifyMode arm){
+        return arms.get(arm.toString()).getMaxExtremeReward();
+    }
+    
+    public static double getAvgValues(ModifyMode arm){
+        return arms.get(arm.toString()).getAvgReward();
     }
     
     public static double getPlayCount(ModifyMode arm){
