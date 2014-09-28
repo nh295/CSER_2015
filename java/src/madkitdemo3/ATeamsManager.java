@@ -65,50 +65,50 @@ public class ATeamsManager extends DesignAgent{
         for(int i=0;i<20;i++){
             // initialize buffer agents
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
-            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 
-        AgentEvaluationCounter.getInstance();
-        
-        //initiate population and send to unevaluated buffer
-        ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-        ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
-        AE.setPopulation(initPop);
-        AE.evaluatePopulation();
-        Stack<Result> stackRes =  AE.getResults();
-        Iterator<Result> iter = stackRes.iterator();
-        AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
-        while(iter.hasNext()){
-            ObjectMessage message = new ObjectMessage(iter.next());
-            sendMessageWithRole(evalBufferAddress,message,manager);
-        }
-        
-        // launch other design agents
-        try {
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDSYNERGY,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDTOSMALLSAT,ManagerMode.ATEAM));
+            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1));
+            AgentEvaluationCounter.getInstance();
+            
+            //initiate population and send to unevaluated buffer
+            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+            ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
+            AE.setPopulation(initPop);
+            AE.evaluatePopulation();
+            Stack<Result> stackRes =  AE.getResults();
+            Iterator<Result> iter = stackRes.iterator();
+            AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
+            while(iter.hasNext()){
+                ObjectMessage message = new ObjectMessage(iter.next());
+                sendMessageWithRole(evalBufferAddress,message,manager);
+            }
+            
+            // launch other design agents
+            try {
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDSYNERGY,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDTOSMALLSAT,ManagerMode.ATEAM));
 //            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ASKUSER,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.BESTNEIGHBOR,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.CROSSOVER,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.IMPROVEORBIT,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.MUTATION,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.RANDOMSEARCH,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEFROMBIGSAT,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEINTERFERENCE,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVESUPERFLUOUS,ManagerMode.ATEAM));
-        } catch (Exception ex) {
-            Logger.getLogger(ATeamsManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        logger.info("All agents initiated. Starting search...");
-        
-        while(!isDone(AgentEvaluationCounter.getTotalEvals())){
-        }
-        System.out.println("Done");
-        System.out.println(AgentEvaluationCounter.getHashMap());
-        AgentEvaluationCounter.saveAgentStats(i);
-        
-        killAgentsInList(searchAgents);
-        killAgentsInList(bufferAgents);
-        killAgentsInList(ancillaryAgents);
-        
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.BESTNEIGHBOR,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.CROSSOVER,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.IMPROVEORBIT,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.MUTATION,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.RANDOMSEARCH,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEFROMBIGSAT,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEINTERFERENCE,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVESUPERFLUOUS,ManagerMode.ATEAM));
+            } catch (Exception ex) {
+                Logger.getLogger(ATeamsManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            logger.info("All agents initiated. Starting search...");
+            
+            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+            }
+            System.out.println("Done");
+            System.out.println(AgentEvaluationCounter.getHashMap());
+            AgentEvaluationCounter.saveAgentStats(i);
+            
+            killAgentsInList(searchAgents);
+            killAgentsInList(bufferAgents);
+            killAgentsInList(ancillaryAgents);
+            
         }
     }
         

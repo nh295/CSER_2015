@@ -48,7 +48,7 @@ public class DMABManager extends DesignAgent{
     private final int c = 5; //scaling between exploitation and exploration
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
-    private final int populationSize = 200;
+    private final int populationSize = 100;
     private Random rand = new Random();
     private static ArrayList<ModifyMode> selectionHistory = new ArrayList();
     private static DMABManager dManager;
@@ -72,20 +72,9 @@ public class DMABManager extends DesignAgent{
 
         createGroupIfAbsent(COMMUNITY, aDesignTeam);
         requestRole(COMMUNITY, aDesignTeam, manager);
-       
-        
-        // initialize buffer agents
-        bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
         
         ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
-        ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 
         
-                
-        //set all agents to have sendProb of 1.0
-        this.setSendProb(1.0);
-        initSendProb(bufferAgents);
-        initSendProb(ancillaryAgents);
-       
         //set up parameters for DMAB
         ArrayList<ModifyMode> modes = new ArrayList();
         for(ModifyMode mod:ModifyMode.values()){
@@ -96,48 +85,58 @@ public class DMABManager extends DesignAgent{
         
     @Override
     protected void live() {
-        AgentEvaluationCounter.getInstance();
-        
-        //initiate population and send to unevaluated buffer
-        ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-        ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
-        AE.setPopulation(initPop);
-        AE.evaluatePopulation();
-        Stack<Result> stackRes =  AE.getResults();
-        Iterator<Result> iter = stackRes.iterator();
-        AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
-        while(iter.hasNext()){
-            ObjectMessage message = new ObjectMessage(iter.next());
-            sendMessageWithRole(evalBufferAddress,message,manager);
-        }
-        
-        
-        while(!isDone(AgentEvaluationCounter.getTotalEvals())){
-            ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
-            selectionHistory.add(modMode);
-            MultiAgentArms.setReady(false);
+        for(int i=0;i<20;i++){
+            AgentEvaluationCounter.getInstance();
+            // initialize buffer agents
+            bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
+            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1));
+            //set all agents to have sendProb of 1.0
+            this.setSendProb(1.0);
+            initSendProb(bufferAgents);
+            initSendProb(ancillaryAgents);
             
-            try {
-                launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
-            } catch (Exception ex) {
-                Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
+            //initiate population and send to unevaluated buffer
+            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+            ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
+            AE.setPopulation(initPop);
+            AE.evaluatePopulation();
+            Stack<Result> stackRes =  AE.getResults();
+            Iterator<Result> iter = stackRes.iterator();
+            AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
+            while(iter.hasNext()){
+                ObjectMessage message = new ObjectMessage(iter.next());
+                sendMessageWithRole(evalBufferAddress,message,manager);
             }
-            while(!MultiAgentArms.isReady()){
-                pause(1);
-                //do nothing
+            
+            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+                ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
+                selectionHistory.add(modMode);
+                MultiAgentArms.setReady(false);
+                
+                try {
+                    launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
+                } catch (Exception ex) {
+                    Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                while(!MultiAgentArms.isReady()){
+                    pause(1);
+                    //do nothing
+                }
+                MultiAgentArms.PHtest(modMode); //do PH test
             }
+            
+            System.out.println("Done");
+            System.out.println(AgentEvaluationCounter.getHashMap());
+            AgentEvaluationCounter.saveAgentStats(1);
+            saveSelectionHistory(i);
+
+            killAgentsInList(bufferAgents);
+            killAgentsInList(ancillaryAgents);
         }
-        
-        System.out.println("Done");
-        System.out.println(AgentEvaluationCounter.getHashMap());
-        AgentEvaluationCounter.saveAgentStats(1);
-        saveSelectionHistory();
     }
         
     @Override
     protected void end(){
-        killAgentsInList(bufferAgents);
-        killAgentsInList(ancillaryAgents);
         
         AbstractAgent.ReturnCode returnCode = leaveRole(COMMUNITY, aDesignTeam, manager);
         if (returnCode == AbstractAgent.ReturnCode.SUCCESS){
@@ -148,7 +147,7 @@ public class DMABManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int iters = 1000;
+        int iters = 200;
     return n>=iters;
     }
     
@@ -242,9 +241,9 @@ public class DMABManager extends DesignAgent{
         }
     }
     
-    public void saveSelectionHistory(){
+    public void saveSelectionHistory(int iteration){
         try {
-            String name = "DMABHistory";
+            String name = "DMABHistory"+Integer.toString(iteration);
             SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd--HH-mm-ss" );
             String stamp = dateFormat.format( new Date() );
             String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";

@@ -1,4 +1,4 @@
-function CSER_analyze_data
+function CSER_analyze_Ateam_data
 
 path = 'C:\Users\Nozomi\Documents\CSER_2015';
 cd(path);
@@ -36,10 +36,10 @@ for i=1:length(agentData)
     for j=1:numAgents
         if isempty(averagePerf{j,1})
             averagePerf(j,1)=oneIteration(j,1);
-            averagePerf(j,2)={length(oneIteration(j,1))};
+            averagePerf(j,2)={length(oneIteration{j,1})};
         else
             averagePerf(j,1) = {sumUpAgentPerformance(averagePerf{j,1},oneIteration{j,1})};
-            averagePerf(j,2)={averagePerf{j,2}+length(oneIteration(j,1))};
+            averagePerf(j,2)={averagePerf{j,2}+length(oneIteration{j,1})};
         end
     end
 end
@@ -54,7 +54,7 @@ figure(1);
 hold on;
 pattern = {'-b','-g','-r','-c','-m','-k',...
            ':b',':g',':r',':c',':m',':k'};
-for(i=1:numAgents)
+for i=1:numAgents
     plot(averagePerf{i,1},pattern{i});
     labels{i}=strcat(char(agentNames{i}),' (',num2str(averagePerf{i,2}),')');
 end
@@ -62,11 +62,11 @@ legend(labels);
 
 %plot on subplot
 figure(2);
-for(i=1:length(data))
+for i=1:numAgents
     subplot(numAgents,1,i)
-    plot(data{i});
-    legend(agent_names{i})
-    axis([1,length(data{i}),-1,1]);
+    plot(averagePerf{i,1});
+    legend(strcat(char(agentNames{i}),' (',num2str(averagePerf{i,2}),')'));
+    axis([1,length(averagePerf{i,1}),-1,1]);
 end
 
 

@@ -60,6 +60,10 @@ public class AgentEvaluationCounter {
         return totalEval;
     }
     
+    public static int getAgentEvals(ModifyMode modMode){
+        return agentEvals.get(modMode);
+    }
+    
     public static HashMap<ModifyMode,Integer> getHashMap(){
         return agentEvals;
     }

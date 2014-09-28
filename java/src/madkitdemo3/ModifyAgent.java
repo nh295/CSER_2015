@@ -118,11 +118,6 @@ public class ModifyAgent extends DesignAgent{
                 for(Architecture neighbor:modifiedArch){
                     Result res = evaluate(neighbor);
                     AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);
-                    if(manMode==ManagerMode.DMABBANDIT){
-                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
-                        if(MultiAgentArms.updateArm(modMode, data))
-                            break;
-                    }
                     if(res.getScience() > best_result.getScience()) {
                         best_result = res;
                     }
@@ -130,9 +125,17 @@ public class ModifyAgent extends DesignAgent{
                 best_arch = best_result.getArch();
                 if(best_arch!=null){
                     sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,best_arch.getResult(),modifier);
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),best_arch.getResult());
+                        MultiAgentArms.updateArm(modMode, data);
+                    }
                 }
                 else{
                     logger.info("No good neighbors");
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),ref.getResult());
+                        MultiAgentArms.updateArm(modMode, data);
+                    }
                 }
                     
             }else{
@@ -146,8 +149,7 @@ public class ModifyAgent extends DesignAgent{
                     AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);        
                     if(manMode==ManagerMode.DMABBANDIT){
                         AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
-                        if(MultiAgentArms.updateArm(modMode, data))
-                            break;
+                        MultiAgentArms.updateArm(modMode, data);
                     }
                 }
             }

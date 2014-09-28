@@ -37,8 +37,10 @@ public class EvaluatedBuffer extends BufferAgent{
         
         while(isAlive() && !endLive){
             
-            Message mail = waitNextMessage();
-            if(mail.getSender().getRole().equalsIgnoreCase(modifier)){
+            Message mail = waitNextMessage(10);
+            if(mail==null){
+                pause(1);
+            }else if(mail.getSender().getRole().equalsIgnoreCase(modifier)){
                 Object content = ((ObjectMessage)mail).getContent();
                 if(content.getClass()==String.class){
                     Architecture next = getRandArch();

@@ -26,7 +26,7 @@ public class MultiAgentArms {
         
         while(modeIter.hasNext()){
             ModifyMode mode = modeIter.next();
-            arms.put(mode.toString(), new AgentArm(mode.toString(),delta,lambda,window));
+            arms.put(mode.toString(), new AgentArm(mode,delta,lambda,window));
         }
     }
     
@@ -38,8 +38,12 @@ public class MultiAgentArms {
         return armsData;
     }
     
-    public static boolean updateArm(ModifyMode arm,AgentArmCredit data){
-        boolean reset = arms.get(arm.toString()).updateArm(data);
+    public static void updateArm(ModifyMode arm,AgentArmCredit data){
+        arms.get(arm.toString()).updateArm(data);
+    }
+    
+    public static boolean PHtest(ModifyMode arm){
+        boolean reset = arms.get(arm.toString()).PHtest();
         if(reset){
             System.out.println(arm.toString() + " triggered PH test. Reseting all arms");
             Set<String> set = arms.keySet();
@@ -49,7 +53,8 @@ public class MultiAgentArms {
             }
             return true;
         }
-        return false;
+        else 
+            return false;
     }
     
     public static double getMaxExtremeValues(ModifyMode arm){
