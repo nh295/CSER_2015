@@ -104,6 +104,7 @@ public class ATeamsManager extends DesignAgent{
         logger.info("All agents initiated. Starting search...");
         
         while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+            pause(1);
         }
         System.out.println("Done");
         System.out.println(AgentEvaluationCounter.getHashMap());
@@ -128,7 +129,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 2000;
+        int evals = 400;
     return n>=evals;
     }
     
