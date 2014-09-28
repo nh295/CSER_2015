@@ -68,38 +68,36 @@ public class ArchSorter extends DesignAgent{
         while(isAlive() && !endLive){
             Message mail = waitNextMessage(100);
             if(mail!=null){
-                switch(mail.getSender().getRole()){
-                    case evaluatedBuffer:
-                        currentPopulation.clearPopulation();
-                        currentPopulation = (ArchPopulation)((ObjectMessage)mail).getContent();
+                if(mail.getSender().getRole().equalsIgnoreCase(evaluatedBuffer)){
+                    currentPopulation.clearPopulation();
+                    currentPopulation = (ArchPopulation)((ObjectMessage)mail).getContent();
                     
-                        // Sort out top pareto ranked architecture
-                        fuzzyParetoArchs = selection_NSGA2();
+                    // Sort out top pareto ranked architecture
+                    fuzzyParetoArchs = selection_NSGA2();
                     
-                        //send pareto front to tradespace agent to plot paretoFront
-                        ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
+                    //send pareto front to tradespace agent to plot paretoFront
+                    ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
                     
-                        sendReply(mail,fuzzyParetoArchMessage);
-                        sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
+                    sendReply(mail,fuzzyParetoArchMessage);
+                    sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
                     
-                        RM.saveResultCollection(new ResultCollection(results2Save));
-        
-                        iteration++;
-                        sp.updateSearchPerformance(results2Save, iteration);
-                        SearchPerformance spTemp = new SearchPerformance(sp);
-                        spm.saveSearchPerformance(spTemp);
-                        perfs.add(spTemp);
-        
-                        int best = spTemp.compareTo(bestPerf);
-                        if (best == 1) {
-                            bestPerf = new SearchPerformance(spTemp);
-                        }
-        
-                        SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
-                        spm.saveSearchPerformanceComparator(spc);
-                        break;
-                    default: logger.warning("unsupported sender: " + mail.getSender().getRole());
-                }
+                    RM.saveResultCollection(new ResultCollection(results2Save));
+                    
+                    iteration++;
+                    sp.updateSearchPerformance(results2Save, iteration);
+                    SearchPerformance spTemp = new SearchPerformance(sp);
+                    spm.saveSearchPerformance(spTemp);
+                    perfs.add(spTemp);
+                    
+                    int best = spTemp.compareTo(bestPerf);
+                    if (best == 1) {
+                        bestPerf = new SearchPerformance(spTemp);
+                    }
+                    
+                    SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
+                    spm.saveSearchPerformanceComparator(spc);
+                }else
+                    logger.warning("unsupported sender: " + mail.getSender().getRole());
             }
         }
     }
@@ -129,7 +127,7 @@ public class ArchSorter extends DesignAgent{
     
     private ArchPopulation selection_NSGA2() {
         //From Dani Selva        
-        ArrayList<Architecture> newPopList = new ArrayList<>();
+        ArrayList<Architecture> newPopList = new ArrayList();
         //non-dominated sorting, returns fronts
         HashMap<Integer,ArrayList<Architecture>> fronts = nonDominatedSorting(currentPopulation,true);
         
@@ -143,11 +141,11 @@ public class ArchSorter extends DesignAgent{
         //Take remaining archs from sorted next front
         int NA = fuzzyParetoArchsWanted - newPopList.size();
         if (NA>0) {
-            ArrayList<Architecture> sorted_last_front = new ArrayList<>();
+            ArrayList<Architecture> sorted_last_front = new ArrayList();
             sorted_last_front.addAll(fronts.get(i));
             computeCrowdingDistance(sorted_last_front);
             Collections.sort(sorted_last_front,Architecture.ArchCrowdDistComparator);
-            ArrayList<Architecture> partial_sorted_last_front = new ArrayList<> (sorted_last_front.subList(0, NA));
+            ArrayList<Architecture> partial_sorted_last_front = new ArrayList(sorted_last_front.subList(0, NA));
             newPopList.addAll(partial_sorted_last_front);
         }
         

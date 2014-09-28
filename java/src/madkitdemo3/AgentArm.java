@@ -22,8 +22,8 @@ public class AgentArm {
     private double playCount;
     private double avgReward;
     private double avgDev;
-    private LinkedList<Double> extremeValue = new LinkedList<>();
-    private LinkedList<Result> resultList = new LinkedList<>();
+    private LinkedList<Double> extremeValue = new LinkedList();
+    private LinkedList<Result> resultList = new LinkedList();
     private double maxDev;
     private int solutionDiversity;
     
@@ -129,7 +129,7 @@ public class AgentArm {
         int dist = 0;
         
         for(int i=0;i<origBit.length;i++){
-            if(0!=Boolean.compare(origBit[i], newBit[i]))
+            if(origBit[i]!=newBit[i])
                 dist++;
         }
         return dist;

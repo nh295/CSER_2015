@@ -46,11 +46,11 @@ import rbsa.eoss.local.Params;
  */
 public class DMABManager extends DesignAgent{
     private final int c = 5; //scaling between exploitation and exploration
-    private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
-    private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
+    private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
+    private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
     private Random rand = new Random();
-    private static ArrayList<ModifyMode> selectionHistory = new ArrayList<>();
+    private static ArrayList<ModifyMode> selectionHistory = new ArrayList();
     private static DMABManager dManager;
     
     public DMABManager(){
@@ -87,7 +87,7 @@ public class DMABManager extends DesignAgent{
         initSendProb(ancillaryAgents);
        
         //set up parameters for DMAB
-        ArrayList<ModifyMode> modes = new ArrayList<>();
+        ArrayList<ModifyMode> modes = new ArrayList();
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
@@ -119,7 +119,7 @@ public class DMABManager extends DesignAgent{
             
             try {
                 launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
             }
             while(!MultiAgentArms.isReady()){
@@ -185,7 +185,7 @@ public class DMABManager extends DesignAgent{
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){
-        Collection<AbstractAgent> agentList = new ArrayList<>();
+        Collection<AbstractAgent> agentList = new ArrayList();
         for(int i=1;i<=n;i++){
             agentList.add(launchAgent(agentClass,false));
         }
@@ -194,7 +194,7 @@ public class DMABManager extends DesignAgent{
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n,boolean gui){
-        Collection<AbstractAgent> agentList = new ArrayList<>();
+        Collection<AbstractAgent> agentList = new ArrayList();
         for(int i=1;i<=n;i++){
             agentList.add(launchAgent(agentClass,gui));
         }
@@ -214,7 +214,7 @@ public class DMABManager extends DesignAgent{
      * @throws InvocationTargetException 
      */
     private Collection<AbstractAgent> launchAgentsIntoLive(Class agentClass,int n,ModifyMode modMode,ManagerMode manMode) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-        Collection<AbstractAgent> agentList = new ArrayList<>();
+        Collection<AbstractAgent> agentList = new ArrayList();
         for(int i=1;i<=n;i++){
             Constructor cotr = agentClass.getConstructor(new Class[]{ModifyMode.class,ManagerMode.class});
             AbstractAgent agent = (AbstractAgent)cotr.newInstance(modMode,manMode);

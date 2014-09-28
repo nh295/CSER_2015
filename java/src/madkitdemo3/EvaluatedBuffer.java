@@ -38,42 +38,39 @@ public class EvaluatedBuffer extends BufferAgent{
         while(isAlive() && !endLive){
             
             Message mail = waitNextMessage();
-            switch(mail.getSender().getRole()){
-                case modifier:
-                    Object content = ((ObjectMessage)mail).getContent();
-                    if(content.getClass()==String.class){
-                        Architecture next = getRandArch();
-                        if(next==null){
-                            ObjectMessage noArchReady = new ObjectMessage(null);
-                            sendReply(mail,noArchReady);
-                        }else{
-                            ObjectMessage reply = new ObjectMessage(next);
-                            sendReply(mail,reply);
-                        }
-                    }else if(content.getClass()==Result.class){
-                        Result res = ((ObjectMessage<Result>)mail).getContent();
-                        addResult(res);
-                        if(getPopulationSize()>=400){
-                            AgentAddress paretoSorterAddress = findAgent(COMMUNITY, aDesignTeam, archSorter);
-                            
-                            ObjectMessage paretoSortMail = new ObjectMessage(getCurrentPopulation());
-                            ObjectMessage<ArchPopulation> reply = (ObjectMessage<ArchPopulation>)sendMessageAndWaitForReply(paretoSorterAddress,paretoSortMail);
-                            clearPopulation();
-                            ArchPopulation paretoPopulation = reply.getContent();
-                            setPopulation(paretoPopulation.copyPopulation());
-                            cleanUpBuffer();
-                            logger.info("cleaning buffer");
-//                        logger.info("sending archs to sorter");
-//                        logger.info("pop size"+Integer.toString(getPopulationSize()));
-                        }
+            if(mail.getSender().getRole().equalsIgnoreCase(modifier)){
+                Object content = ((ObjectMessage)mail).getContent();
+                if(content.getClass()==String.class){
+                    Architecture next = getRandArch();
+                    if(next==null){
+                        ObjectMessage noArchReady = new ObjectMessage(null);
+                        sendReply(mail,noArchReady);
+                    }else{
+                        ObjectMessage reply = new ObjectMessage(next);
+                        sendReply(mail,reply);
                     }
-                    break;
-                case manager:
+                }else if(content.getClass()==Result.class){
                     Result res = ((ObjectMessage<Result>)mail).getContent();
                     addResult(res);
-                    break;
-                default: logger.warning("unsupported sender: " + mail.getSender().getRole());
-            }
+                    if(getPopulationSize()>=400){
+                        AgentAddress paretoSorterAddress = findAgent(COMMUNITY, aDesignTeam, archSorter);
+                        
+                        ObjectMessage paretoSortMail = new ObjectMessage(getCurrentPopulation());
+                        ObjectMessage<ArchPopulation> reply = (ObjectMessage<ArchPopulation>)sendMessageAndWaitForReply(paretoSorterAddress,paretoSortMail);
+                        clearPopulation();
+                        ArchPopulation paretoPopulation = reply.getContent();
+                        setPopulation(paretoPopulation.copyPopulation());
+                        cleanUpBuffer();
+                        logger.info("cleaning buffer");
+//                        logger.info("sending archs to sorter");
+//                        logger.info("pop size"+Integer.toString(getPopulationSize()));
+                    }
+                }
+            }else if(mail.getSender().getRole().equalsIgnoreCase(manager)){
+                Result res = ((ObjectMessage<Result>)mail).getContent();
+                addResult(res);
+            }else
+                logger.warning("unsupported sender: " + mail.getSender().getRole());
         }
     }
     
