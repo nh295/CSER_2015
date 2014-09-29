@@ -95,7 +95,7 @@ public class ArchSorter extends DesignAgent{
     protected void end(){
         long time = System.currentTimeMillis();
         logger.info(Long.toString(time)+": evals="+AgentEvaluationCounter.getTotalEvals());
-        SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(time),perfs);
+        SearchPerformanceComparator spc = new SearchPerformanceComparator(perfs);
         spm.saveSearchPerformanceComparator(spc);
         System.out.println("ArchSorter saving and dying");
     }
