@@ -108,6 +108,7 @@ public class ATeamsManager extends DesignAgent{
             killAgentsInList(searchAgents);
             killAgentsInList(bufferAgents);
             killAgentsInList(ancillaryAgents);
+            pause(1000);
         }
     }
         
@@ -123,7 +124,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 10;
+        int evals = 2000;
     return n>=evals;
     }
     

@@ -63,7 +63,7 @@ public class ArchSorter extends DesignAgent{
         ArchPopulation fuzzyParetoArchs;
         
         
-        AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
+//        AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
             Message mail = waitNextMessage(100);
@@ -79,7 +79,7 @@ public class ArchSorter extends DesignAgent{
                     ObjectMessage fuzzyParetoArchMessage = new ObjectMessage(fuzzyParetoArchs.copyPopulation());
                     
                     sendReply(mail,fuzzyParetoArchMessage);
-                    sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
+//                    sendMessage(tradespaceAddress,fuzzyParetoArchMessage); //get tradespace to plot after every sort
                     
                     RM.saveResultCollection(new ResultCollection(results2Save));
                     
