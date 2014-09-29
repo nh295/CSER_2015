@@ -54,7 +54,7 @@ public class EvaluatedBuffer extends BufferAgent{
                 }else if(content.getClass()==Result.class){
                     Result res = ((ObjectMessage<Result>)mail).getContent();
                     addResult(res);
-                    if(getPopulationSize()>=100){
+                    if(getPopulationSize()>=400){
                         AgentAddress paretoSorterAddress = findAgent(COMMUNITY, aDesignTeam, archSorter);
                         
                         ObjectMessage paretoSortMail = new ObjectMessage(getCurrentPopulation());

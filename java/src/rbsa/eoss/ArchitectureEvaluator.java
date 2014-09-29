@@ -66,6 +66,7 @@ public class ArchitectureEvaluator {
         lowTRLinstruments = new ArrayList<String>();
         population = null;
         rp = null;
+        tpe.shutdown();
         tpe = null;
         numCPU = 0;
         capabilities = null;
