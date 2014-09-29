@@ -63,6 +63,8 @@ public class ATeamsManager extends DesignAgent{
     protected void live() {
         
         for(int i=0;i<20;i++){
+            ArchitectureEvaluator.getInstance().init(11);
+            
             // initialize buffer agents
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
             ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1,true));
@@ -102,8 +104,26 @@ public class ATeamsManager extends DesignAgent{
             while(!isDone(AgentEvaluationCounter.getTotalEvals())){
                 pause(10);
             }
+            
+            for(AbstractAgent agent:searchAgents){
+                AbstractAgent.ReturnCode returnCode = AbstractAgent.ReturnCode.TIMEOUT;
+                while(returnCode!=AbstractAgent.ReturnCode.ALREADY_KILLED && returnCode!=AbstractAgent.ReturnCode.SUCCESS){
+                    returnCode = killAgent(agent,100);
+                }
+            }
+            
+            killAgent(ancillaryAgents.iterator().next(),10000);
+            killAgent(bufferAgents.iterator().next(),10000);
+            
+            
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
+            
+            AgentEvaluationCounter.saveAgentStats(i);
+            AgentSelectionHistory.saveSelectionHistory(i);
+            AgentEvaluationCounter.reset();
+            AgentSelectionHistory.reset();
+            ArchitectureEvaluator.getInstance().clear();
         }
     }
         

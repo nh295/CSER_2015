@@ -47,10 +47,10 @@ public class RBSAEOSSSMAP {
         //PATH
         //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
 //        String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
-        String path = "C:\\Users\\Nozomi\\Documents\\CSER_2015";
-//        String path = "C:\\Users\\SEAK1\\Nozomi\\CSER_2015";
+//        String path = "C:\\Users\\Nozomi\\Documents\\CSER_2015";
+        String path = "C:\\Users\\SEAK1\\Nozomi\\CSER_2015";
         
-        int MODE = 11;
+        int MODE = 10;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();
@@ -269,29 +269,11 @@ public class RBSAEOSSSMAP {
             case 10: // madkit agent based Ateams mode
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
                 AgentSelectionHistory.getInstance();
-                for(int i=0;i<20;i++){
-                    AE.init(11);
-                    kernel = new Madkit("--launchAgents",ATeamsManager.class.getName() + ",true,1;");
-                    kernel.doAction(KernelAction.EXIT, "no args");
-                    AE.clear();
-                    AgentEvaluationCounter.saveAgentStats(i);
-                    AgentSelectionHistory.saveSelectionHistory(i);
-                    AgentEvaluationCounter.reset();
-                    AgentSelectionHistory.reset();
-                }
+                kernel = new Madkit("--launchAgents",ATeamsManager.class.getName() + ",true,1;");
                 break;
             case 11: // madkit agent based K Arm Bandit Mode
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
-                for(int i=0;i<20;i++){
-                    AE.init(3);
-                    kernel= new Madkit("--launchAgents",DMABManager.class.getName() + ",true,1;");
-                    kernel.doAction(KernelAction.EXIT, "no args");
-                    AE.clear();
-                    AgentEvaluationCounter.saveAgentStats(i);
-                    AgentSelectionHistory.saveSelectionHistory(i);
-                    AgentEvaluationCounter.reset();
-                    AgentSelectionHistory.reset();
-                }
+                kernel= new Madkit("--launchAgents",DMABManager.class.getName() + ",true,1;");
                 break;
             default:
                 System.out.println("Choose a mode between 1 and 11");

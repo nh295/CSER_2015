@@ -106,7 +106,7 @@ public class ArchSorter extends DesignAgent{
     
     @Override
     protected void end(){
-        System.out.println("ArchSorter dying");
+        System.out.println("ArchSorter dying bllaaa");
     }
 //    /**
 //     * 

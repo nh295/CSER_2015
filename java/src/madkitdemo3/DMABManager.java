@@ -64,6 +64,8 @@ public class DMABManager extends DesignAgent{
     @Override
     protected void live() {
         for(int i=0;i<20;i++){
+            ArchitectureEvaluator.getInstance().init(3);
+             
             AgentEvaluationCounter.getInstance();
             AgentSelectionHistory.getInstance();
             // initialize buffer agents
@@ -107,6 +109,12 @@ public class DMABManager extends DesignAgent{
             
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
+            
+            AgentEvaluationCounter.saveAgentStats(i);
+            AgentSelectionHistory.saveSelectionHistory(i);
+            AgentEvaluationCounter.reset();
+            AgentSelectionHistory.reset();
+            ArchitectureEvaluator.getInstance().clear();
         }
     }
         

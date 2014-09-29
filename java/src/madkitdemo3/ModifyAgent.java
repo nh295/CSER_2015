@@ -161,10 +161,10 @@ public class ModifyAgent extends DesignAgent{
         System.out.println("Modifier dying");
         if(manMode == ManagerMode.DMABBANDIT)
             MultiAgentArms.setReady(true);
-        if(!endLive){
-            System.out.println(this.modMode+" agent died but wasn't supposed to");
-            System.exit(1);
-        }
+//        if(!endLive){
+//            System.out.println(this.modMode+" agent died but wasn't supposed to");
+//            System.exit(1);
+//        }
     }
     
     private Result evaluate(Architecture arch){
