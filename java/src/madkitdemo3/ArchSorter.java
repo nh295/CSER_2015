@@ -41,7 +41,6 @@ public class ArchSorter extends DesignAgent{
     private int iteration = 0;
     private ArrayList<SearchPerformance> perfs;
     private ResultManager RM;
-    private SearchPerformance bestPerf;
     private Stack<Result> results2Save;
     
     @Override
@@ -54,15 +53,12 @@ public class ArchSorter extends DesignAgent{
         spm = SearchPerformanceManager.getInstance();
         perfs = new ArrayList();
         RM =  ResultManager.getInstance();
-        bestPerf = new SearchPerformance();
         results2Save = new Stack();
     }
     
     @Override
     protected void live(){
         ArchPopulation fuzzyParetoArchs;
-        
-        
 //        AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
@@ -88,16 +84,6 @@ public class ArchSorter extends DesignAgent{
                     SearchPerformance spTemp = new SearchPerformance(sp);
                     spm.saveSearchPerformance(spTemp);
                     perfs.add(spTemp);
-                    
-                    int best = spTemp.compareTo(bestPerf);
-                    if (best == 1) {
-                        bestPerf = new SearchPerformance(spTemp);
-                    }
-                    
-                   long time = System.currentTimeMillis();
-                    logger.info(Long.toString(time)+": evals="+AgentEvaluationCounter.getTotalEvals());
-                    SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(time),perfs);
-                    spm.saveSearchPerformanceComparator(spc);
                 }else
                     logger.warning("unsupported sender: " + mail.getSender().getRole());
             }
@@ -106,7 +92,11 @@ public class ArchSorter extends DesignAgent{
     
     @Override
     protected void end(){
-        System.out.println("ArchSorter dying bllaaa");
+        long time = System.currentTimeMillis();
+        logger.info(Long.toString(time)+": evals="+AgentEvaluationCounter.getTotalEvals());
+        SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(time),perfs);
+        spm.saveSearchPerformanceComparator(spc);
+        System.out.println("ArchSorter saving and dying");
     }
 //    /**
 //     * 
