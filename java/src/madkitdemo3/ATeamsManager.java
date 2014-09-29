@@ -40,6 +40,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
+    private final int maxEvals = 2000;
     
     @Override
     protected void activate() {
@@ -76,9 +77,14 @@ public class ATeamsManager extends DesignAgent{
             
             //initiate population and send to unevaluated buffer
             ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+            initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+            if(initPop.size()!=populationSize)
+                System.out.println("why population size not right?");
             AE.setPopulation(initPop);
             AE.evaluatePopulation();
             Stack<Result> stackRes =  AE.getResults();
+            if(stackRes.size()!=populationSize)
+                System.out.println("why population size not right?");
             Iterator<Result> iter = stackRes.iterator();
             AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
             while(iter.hasNext()){
@@ -106,6 +112,13 @@ public class ATeamsManager extends DesignAgent{
             
             while(!isDone(AgentEvaluationCounter.getTotalEvals())){
                 pause(10);
+            }
+            
+            //count up the number of tiems the archSorter has saved performance 
+            int performanceSaveCount=0;
+            while(performanceSaveCount!=(populationSize)){
+                Message mail = waitNextMessage();
+                performanceSaveCount++;
             }
             
             for(AbstractAgent agent:searchAgents){
@@ -140,8 +153,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 2000;
-    return n>=evals;
+    return n>=maxEvals;
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){

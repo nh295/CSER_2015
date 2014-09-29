@@ -85,6 +85,8 @@ public class ArchSorter extends DesignAgent{
                     SearchPerformance spTemp = new SearchPerformance(sp);
                     spm.saveSearchPerformance(spTemp);
                     perfs.add(spTemp);
+                    
+                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new Message());
                 }else
                     logger.warning("unsupported sender: " + mail.getSender().getRole());
             }
