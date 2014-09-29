@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import madkit.kernel.AbstractAgent;
 import madkit.kernel.AgentAddress;
+import madkit.kernel.Message;
 import madkit.message.ObjectMessage;
 import madkitdemo3.ModifyAgent.ModifyMode;
 
@@ -41,6 +42,7 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
     private final int populationSize = 200;
+    private final int maxEvals = 2000;
     private Random rand = new Random();
     
     @Override
@@ -82,9 +84,13 @@ public class DMABManager extends DesignAgent{
             
             //initiate population and send to unevaluated buffer
             ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+            if(initPop.size()!=populationSize)
+                System.out.println("why population size not right?");
             AE.setPopulation(initPop);
             AE.evaluatePopulation();
             Stack<Result> stackRes =  AE.getResults();
+            if(stackRes.size()!=populationSize)
+                System.out.println("why population size not right?");
             Iterator<Result> iter = stackRes.iterator();
             AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
             while(iter.hasNext()){
@@ -110,6 +116,16 @@ public class DMABManager extends DesignAgent{
                     AgentSelectionHistory.incResetNum();
             }
             
+            //count up the number of tiems the archSorter has saved performance 
+            int performanceSaveCount=0;
+            while(performanceSaveCount!=(populationSize)){
+                Message mail = waitNextMessage();
+                performanceSaveCount++;
+            }
+            
+            killAgent(ancillaryAgents.iterator().next(),10000);
+            killAgent(bufferAgents.iterator().next(),10000);
+            
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
             
@@ -133,8 +149,7 @@ public class DMABManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int iters = 2000;
-    return n>=iters;
+    return n>=maxEvals;
     }
     
     private ModifyMode selectOperator(int totalPlays){
