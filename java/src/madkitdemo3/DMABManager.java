@@ -73,7 +73,7 @@ public class DMABManager extends DesignAgent{
         createGroupIfAbsent(COMMUNITY, aDesignTeam);
         requestRole(COMMUNITY, aDesignTeam, manager);
         
-        ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
+//        ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
         
         //set up parameters for DMAB
         ArrayList<ModifyMode> modes = new ArrayList();
@@ -132,6 +132,8 @@ public class DMABManager extends DesignAgent{
 
             killAgentsInList(bufferAgents);
             killAgentsInList(ancillaryAgents);
+            while((getAgentWithRole(COMMUNITY, aDesignTeam, evaluatedBuffer))!=null)
+                pause(1);
         }
     }
         

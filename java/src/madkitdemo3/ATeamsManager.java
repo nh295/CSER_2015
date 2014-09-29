@@ -108,7 +108,7 @@ public class ATeamsManager extends DesignAgent{
             killAgentsInList(searchAgents);
             killAgentsInList(bufferAgents);
             killAgentsInList(ancillaryAgents);
-            
+            pause(1000);
         }
     }
         
