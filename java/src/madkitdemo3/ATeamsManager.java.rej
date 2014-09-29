@@ -1,0 +1,9 @@
+diff a/java/src/madkitdemo3/ATeamsManager.java b/java/src/madkitdemo3/ATeamsManager.java	(rejected hunks)
+@@ -39,7 +39,6 @@
+     private static final Collection<AbstractAgent> searchAgents = new ArrayList<>();
+     private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
+     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
+-    private final int populationSize = 400;
+     private final int populationSize = 100;
+     
+     @Override
