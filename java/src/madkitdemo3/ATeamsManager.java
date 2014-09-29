@@ -39,7 +39,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> searchAgents = new ArrayList();
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
-    private final int populationSize = 200;
+    private final int populationSize = 100;
     
     @Override
     protected void activate() {
@@ -49,7 +49,7 @@ public class ATeamsManager extends DesignAgent{
         createGroupIfAbsent(COMMUNITY, aDesignTeam);
         requestRole(COMMUNITY, aDesignTeam, manager);
        
-        ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
+//        ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
                 
         //set all agents to have sendProb of 1.0
         this.setSendProb(1.0);
@@ -108,7 +108,17 @@ public class ATeamsManager extends DesignAgent{
             killAgentsInList(searchAgents);
             killAgentsInList(bufferAgents);
             killAgentsInList(ancillaryAgents);
-            pause(1000);
+            
+            while(getAgentWithRole(COMMUNITY, aDesignTeam, evaluatedBuffer)!=null)
+                    pause(10);
+            Iterator<AbstractAgent> agentIter = searchAgents.iterator();
+            while(agentIter.hasNext()){
+                AbstractAgent agent = agentIter.next();
+                while(agent.isAlive())
+                    killAgent(agent);
+                        pause(10);
+            }
+            pause(5000);
         }
     }
         
@@ -124,7 +134,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 2000;
+        int evals = 100;
     return n>=evals;
     }
     
