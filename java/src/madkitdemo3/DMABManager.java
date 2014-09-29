@@ -48,6 +48,7 @@ public class DMABManager extends DesignAgent{
     private final int c = 5; //scaling between exploitation and exploration
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
+    private static Collection<AbstractAgent> searchAgents = new ArrayList();
     private final int populationSize = 100;
     private Random rand = new Random();
     
@@ -101,7 +102,7 @@ public class DMABManager extends DesignAgent{
                 MultiAgentArms.setReady(false);
                 
                 try {
-                    launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
+                    searchAgents = launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
                 } catch (Exception ex) {
                     Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -119,8 +120,16 @@ public class DMABManager extends DesignAgent{
 
             killAgentsInList(bufferAgents);
             killAgentsInList(ancillaryAgents);
-            while((getAgentWithRole(COMMUNITY, aDesignTeam, evaluatedBuffer))!=null)
-                pause(1);
+            while(getAgentWithRole(COMMUNITY, aDesignTeam, evaluatedBuffer)!=null)
+                    pause(10);
+            Iterator<AbstractAgent> agentIter = searchAgents.iterator();
+            while(agentIter.hasNext()){
+                AbstractAgent agent = agentIter.next();
+                while(agent.isAlive())
+                    killAgent(agent);
+                        pause(10);
+            }
+            pause(5000);
         }
     }
         
