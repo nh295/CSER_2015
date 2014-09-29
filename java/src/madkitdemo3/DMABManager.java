@@ -63,8 +63,12 @@ public class DMABManager extends DesignAgent{
         
     @Override
     protected void live() {
+        ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
+        AE.init(2);
+        AE.evalMinMax();
+        AE.clear();
         for(int i=0;i<20;i++){
-            ArchitectureEvaluator.getInstance().init(3);
+            AE.init(3);
              
             AgentEvaluationCounter.getInstance();
             AgentSelectionHistory.getInstance();
@@ -78,7 +82,6 @@ public class DMABManager extends DesignAgent{
             
             //initiate population and send to unevaluated buffer
             ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
             AE.setPopulation(initPop);
             AE.evaluatePopulation();
             Stack<Result> stackRes =  AE.getResults();
@@ -114,7 +117,7 @@ public class DMABManager extends DesignAgent{
             AgentSelectionHistory.saveSelectionHistory(i);
             AgentEvaluationCounter.reset();
             AgentSelectionHistory.reset();
-            ArchitectureEvaluator.getInstance().clear();
+            AE.clear();
         }
     }
         

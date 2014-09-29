@@ -35,7 +35,7 @@ public class ArchSorter extends DesignAgent{
     // sent to their respective buffers
     
     private ArchPopulation currentPopulation;
-    private final int fuzzyParetoArchsWanted = 200;
+    private final int fuzzyParetoArchsWanted = 50;
     private static SearchPerformance sp;
     private SearchPerformanceManager spm;
     private int iteration = 0;
@@ -49,7 +49,6 @@ public class ArchSorter extends DesignAgent{
         createGroupIfAbsent(COMMUNITY, aDesignTeam);
         requestRole(COMMUNITY, aDesignTeam, archSorter);
         currentPopulation = new ArchPopulation();
-        sp = new SearchPerformance();
         spm = SearchPerformanceManager.getInstance();
         perfs = new ArrayList();
         RM =  ResultManager.getInstance();
@@ -65,6 +64,8 @@ public class ArchSorter extends DesignAgent{
             Message mail = waitNextMessage(100);
             if(mail!=null){
                 if(mail.getSender().getRole().equalsIgnoreCase(evaluatedBuffer)){
+                    sp = new SearchPerformance();
+                    
                     currentPopulation.clearPopulation();
                     currentPopulation = (ArchPopulation)((ObjectMessage)mail).getContent();
                     

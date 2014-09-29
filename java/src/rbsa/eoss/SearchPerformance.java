@@ -132,9 +132,10 @@ public class SearchPerformance implements Serializable {
     private Result compute_cheapest_max_benefit_arch() {
         Result res = null;
         double min_cost = 1e10;
+        double max_science = 0;
         for (int i = 0;i<narch_front;i++) {
             Result re = current_pareto_front.get(i);
-            if (re.getScience() == Params.max_science && re.getCost() < min_cost) {
+            if (re.getScience() > max_science && re.getCost() < min_cost) {
                 min_cost = re.getCost();
                 res = re;
             }
