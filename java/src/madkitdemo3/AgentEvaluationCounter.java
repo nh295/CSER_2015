@@ -103,7 +103,7 @@ public class AgentEvaluationCounter {
         }
     }
     
-    public static void resetCounter(){
+    public static void reset(){
         AEC = new AgentEvaluationCounter();
     }
 }

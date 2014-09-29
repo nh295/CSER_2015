@@ -31,6 +31,7 @@ end
 
 modes = ASH.getModes;
 numAgents = modes.length;
+max_data_length = 
 avg_history = zeros(agentData{1}.size,numAgents);
 
 for i=1:length(filename)
@@ -52,8 +53,8 @@ hold on;
 pattern = {'-b','-g','-r','-c','-m','-k',...
            ':b',':g',':r',':c',':m',':k'};
 for i=1:numAgents
-    plot(avg_history(i,),pattern{i});
-    labels{i}=strcat(char(agentNames{i}),' (',num2str(averagePerf{i,2}),')');
+    plot(avg_history(:,i),pattern{i});
+    labels{i}=char(modes(i));
 end
 legend(labels);
 
@@ -61,19 +62,9 @@ legend(labels);
 figure(2);
 for i=1:numAgents
     subplot(numAgents,1,i)
-    plot(averagePerf{i,1});
-    legend(strcat(char(agentNames{i}),' (',num2str(averagePerf{i,2}),')'));
-    axis([1,length(averagePerf{i,1}),-1,1]);
+     plot(avg_history(:,i))
+    legend(char(modes(i)));
 end
 
 
-end
-
-function sum = sumUpAgentPerformance(run1, run2)
-if(length(run1)>length(run2))
-    run2(length(run1)) = 0;
-elseif (length(run1)<length(run2))
-    run1(length(run2)) = 0;
-end
-sum = run1+run2;
 end

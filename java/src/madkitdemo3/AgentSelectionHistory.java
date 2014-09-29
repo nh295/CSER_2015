@@ -24,9 +24,11 @@ import rbsa.eoss.local.Params;
 public class AgentSelectionHistory {
     private static AgentSelectionHistory ASH;
     private static ArrayList<ModifyMode> selectionHistory;
+    private static int resetNum;
     private static final ModifyMode[] modeOptions = ModifyMode.values();
     
     private AgentSelectionHistory(){
+        resetNum = 0;
         selectionHistory = new ArrayList();
     }
     
@@ -75,8 +77,20 @@ public class AgentSelectionHistory {
         }
     }
     
+    public static void incResetNum(){
+        resetNum++;
+    }
+    
+    public static int getResetNum(){
+        return resetNum;
+    }
+    
     public static ModifyMode[] getModes(){
         return modeOptions;
+    }
+    
+    public static void reset(){
+        ASH = new AgentSelectionHistory();
     }
     
 }

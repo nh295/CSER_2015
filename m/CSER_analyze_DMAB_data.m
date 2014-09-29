@@ -31,7 +31,13 @@ end
 
 modes = ASH.getModes;
 numAgents = modes.length;
-avg_history = zeros(agentData{1}.size,numAgents);
+max_data_length = 0;
+for i =1:length(filename)
+    if agentData{i}.size > max_data_length
+        max_data_length = agentData{i}.size;
+    end
+end
+avg_history = zeros(max_data_length,numAgents);
 
 for i=1:length(filename)
     history = agentData{i};
