@@ -65,7 +65,7 @@ public class ATeamsManager extends DesignAgent{
         for(int i=0;i<20;i++){
             // initialize buffer agents
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
-            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1));
+            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1,true));
             AgentEvaluationCounter.getInstance();
             
             //initiate population and send to unevaluated buffer
@@ -104,22 +104,6 @@ public class ATeamsManager extends DesignAgent{
             }
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
-            AgentEvaluationCounter.saveAgentStats(i);
-            
-            killAgentsInList(searchAgents);
-            killAgentsInList(bufferAgents);
-            killAgentsInList(ancillaryAgents);
-            
-            while(getAgentWithRole(COMMUNITY, aDesignTeam, evaluatedBuffer)!=null)
-                    pause(10);
-            Iterator<AbstractAgent> agentIter = searchAgents.iterator();
-            while(agentIter.hasNext()){
-                AbstractAgent agent = agentIter.next();
-                while(agent.isAlive())
-                    killAgent(agent);
-                        pause(10);
-            }
-            pause(5000);
         }
     }
         

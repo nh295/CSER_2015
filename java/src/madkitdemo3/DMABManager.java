@@ -7,28 +7,19 @@
 package madkitdemo3;
 
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import static java.lang.Double.NaN;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import madkit.kernel.AbstractAgent;
 import madkit.kernel.AgentAddress;
-import madkit.kernel.Message;
 import madkit.message.ObjectMessage;
 import madkitdemo3.ModifyAgent.ModifyMode;
 
@@ -49,22 +40,8 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
-    private final int populationSize = 100;
+    private final int populationSize = 200;
     private Random rand = new Random();
-    private static ArrayList<ModifyMode> selectionHistory = new ArrayList();
-    private static DMABManager dManager;
-    
-    public DMABManager(){
-        
-    }
-    
-    public static DMABManager getInstance(){
-        if(dManager==null){
-            dManager = new DMABManager();
-        }
-        return dManager;
-    }
-    
     
     @Override
     protected void activate() {
@@ -88,9 +65,10 @@ public class DMABManager extends DesignAgent{
     protected void live() {
         for(int i=0;i<20;i++){
             AgentEvaluationCounter.getInstance();
+            AgentSelectionHistory.getInstance();
             // initialize buffer agents
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
-            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1));
+            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1,true));
             //set all agents to have sendProb of 1.0
             this.setSendProb(1.0);
             initSendProb(bufferAgents);
@@ -111,7 +89,7 @@ public class DMABManager extends DesignAgent{
             
             while(!isDone(AgentEvaluationCounter.getTotalEvals())){
                 ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
-                selectionHistory.add(modMode);
+                AgentSelectionHistory.addSelection(modMode);
                 MultiAgentArms.setReady(false);
                 
                 try {
@@ -123,26 +101,12 @@ public class DMABManager extends DesignAgent{
                     pause(1);
                     //do nothing
                 }
-                MultiAgentArms.PHtest(modMode); //do PH test
+                if(MultiAgentArms.PHtest(modMode)) //do PH test
+                    AgentSelectionHistory.incResetNum();
             }
             
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
-            AgentEvaluationCounter.saveAgentStats(1);
-            saveSelectionHistory(i);
-
-            killAgentsInList(bufferAgents);
-            killAgentsInList(ancillaryAgents);
-            while(getAgentWithRole(COMMUNITY, aDesignTeam, evaluatedBuffer)!=null)
-                    pause(10);
-            Iterator<AbstractAgent> agentIter = searchAgents.iterator();
-            while(agentIter.hasNext()){
-                AbstractAgent agent = agentIter.next();
-                while(agent.isAlive())
-                    killAgent(agent);
-                        pause(10);
-            }
-            pause(5000);
         }
     }
         
@@ -158,7 +122,7 @@ public class DMABManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int iters = 200;
+        int iters = 2000;
     return n>=iters;
     }
     
@@ -249,41 +213,6 @@ public class DMABManager extends DesignAgent{
         while(i.hasNext()){
             DesignAgent agentToKill = (DesignAgent)i.next();
             agentToKill.suicide();
-        }
-    }
-    
-    public void saveSelectionHistory(int iteration){
-        try {
-            String name = "DMABHistory"+Integer.toString(iteration);
-            SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd--HH-mm-ss" );
-            String stamp = dateFormat.format( new Date() );
-            String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";
-            FileOutputStream file = new FileOutputStream( file_path );
-            ObjectOutputStream os = new ObjectOutputStream( file );
-            os.writeObject(selectionHistory);
-            os.close();
-            file.close();
-        } catch (Exception e) {
-            System.out.println( e.getMessage() );
-        }
-    }
-    
-    public static ArrayList<ModifyMode> loadAgentStatFromFile(String filePath )
-    {
-        ArrayList<ModifyMode> history;
-        
-        try {
-            FileInputStream file = new FileInputStream( filePath );
-            ObjectInputStream is = new ObjectInputStream( file );
-            history = (ArrayList<ModifyMode>)is.readObject();
-            is.close();
-            file.close();
-            selectionHistory = history;
-            return history;
-        } catch (Exception e) {
-            System.out.println( "The stats for agents is not found" );
-            System.out.println( e.getMessage() );
-            return null;
         }
     }
 

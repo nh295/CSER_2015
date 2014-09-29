@@ -94,7 +94,9 @@ public class ArchSorter extends DesignAgent{
                         bestPerf = new SearchPerformance(spTemp);
                     }
                     
-                    SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(System.currentTimeMillis()),perfs);
+                   long time = System.currentTimeMillis();
+                    logger.info(Long.toString(time)+": evals="+AgentEvaluationCounter.getTotalEvals());
+                    SearchPerformanceComparator spc = new SearchPerformanceComparator(Long.toString(time),perfs);
                     spm.saveSearchPerformanceComparator(spc);
                 }else
                     logger.warning("unsupported sender: " + mail.getSender().getRole());
