@@ -64,7 +64,7 @@ public class DMABManager extends DesignAgent{
     @Override
     protected void live() {
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
-        AE.init(2);
+        AE.init(1);
         AE.evalMinMax();
         AE.clear();
         for(int i=0;i<20;i++){

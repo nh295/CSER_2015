@@ -35,7 +35,7 @@ public class ArchSorter extends DesignAgent{
     // sent to their respective buffers
     
     private ArchPopulation currentPopulation;
-    private final int fuzzyParetoArchsWanted = 50;
+    private final int fuzzyParetoArchsWanted = 200;
     private static SearchPerformance sp;
     private SearchPerformanceManager spm;
     private int iteration = 0;
