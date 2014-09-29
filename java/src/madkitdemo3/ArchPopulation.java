@@ -24,7 +24,7 @@ public final class ArchPopulation {
     private ArrayList<Architecture> population; //use hashcode from Architeture
     
     public ArchPopulation(){
-        population = new ArrayList<>();
+        population = new ArrayList();
     }
     
     public ArchPopulation(List<Architecture> archList){

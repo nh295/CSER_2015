@@ -118,11 +118,6 @@ public class ModifyAgent extends DesignAgent{
                 for(Architecture neighbor:modifiedArch){
                     Result res = evaluate(neighbor);
                     AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);
-                    if(manMode==ManagerMode.DMABBANDIT){
-                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
-                        if(MultiAgentArms.updateArm(modMode, data))
-                            break;
-                    }
                     if(res.getScience() > best_result.getScience()) {
                         best_result = res;
                     }
@@ -130,9 +125,17 @@ public class ModifyAgent extends DesignAgent{
                 best_arch = best_result.getArch();
                 if(best_arch!=null){
                     sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,best_arch.getResult(),modifier);
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),best_arch.getResult());
+                        MultiAgentArms.updateArm(modMode, data);
+                    }
                 }
                 else{
                     logger.info("No good neighbors");
+                    if(manMode==ManagerMode.DMABBANDIT){
+                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),ref.getResult());
+                        MultiAgentArms.updateArm(modMode, data);
+                    }
                 }
                     
             }else{
@@ -146,8 +149,7 @@ public class ModifyAgent extends DesignAgent{
                     AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);        
                     if(manMode==ManagerMode.DMABBANDIT){
                         AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
-                        if(MultiAgentArms.updateArm(modMode, data))
-                            break;
+                        MultiAgentArms.updateArm(modMode, data);
                     }
                 }
             }
@@ -176,31 +178,31 @@ public class ModifyAgent extends DesignAgent{
      */
     private ArrayList<Architecture> mutate(Architecture orig){
         Architecture modifiedArch = orig.mutate1bit();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }    
     private ArrayList<Architecture> addRand2SmallSat(Architecture orig){
         Architecture modifiedArch = orig.addRandomToSmallSat();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> addSynergy(Architecture orig){
         Architecture modifiedArch = orig.addSynergy();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> removeInter(Architecture orig){
         Architecture modifiedArch = orig.removeInterference();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> removeRandLargeSat(Architecture orig){
         Architecture modifiedArch = orig.removeRandomFromLoadedSat();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
@@ -209,31 +211,31 @@ public class ModifyAgent extends DesignAgent{
     }
     private ArrayList<Architecture> removeSuperfluous(Architecture orig){
         Architecture modifiedArch = orig.removeSuperfluous();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> randSearch(Architecture orig){
         Architecture modifiedArch = orig.randomSearch();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> askUser(Architecture orig){
         Architecture modifiedArch = orig.askUserToImprove();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> improveOrbit(Architecture orig){
         Architecture modifiedArch = orig.improveOrbit();
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }
     private ArrayList<Architecture> crossover(Architecture mother,Architecture father){
         Architecture modifiedArch = mother.crossover1point(father);
-        ArrayList<Architecture> out = new ArrayList<>();
+        ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
     }

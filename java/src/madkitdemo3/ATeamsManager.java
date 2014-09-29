@@ -36,9 +36,9 @@ import rbsa.eoss.SearchPerformance;
  */
 public class ATeamsManager extends DesignAgent{
     
-    private static final Collection<AbstractAgent> searchAgents = new ArrayList<>();
-    private static final Collection<AbstractAgent> bufferAgents = new ArrayList<>();
-    private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList<>();
+    private static final Collection<AbstractAgent> searchAgents = new ArrayList();
+    private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
+    private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
     
     @Override
@@ -49,11 +49,7 @@ public class ATeamsManager extends DesignAgent{
         createGroupIfAbsent(COMMUNITY, aDesignTeam);
         requestRole(COMMUNITY, aDesignTeam, manager);
        
-        
-        
-        
         ancillaryAgents.addAll(launchAgentsIntoLive(Tradespace.class.getName(),1,true));
-        
                 
         //set all agents to have sendProb of 1.0
         this.setSendProb(1.0);
@@ -69,51 +65,50 @@ public class ATeamsManager extends DesignAgent{
         for(int i=0;i<20;i++){
             // initialize buffer agents
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
-            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1)); 
-        AgentEvaluationCounter.getInstance();
-        
-        //initiate population and send to unevaluated buffer
-        ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-        ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
-        AE.setPopulation(initPop);
-        AE.evaluatePopulation();
-        Stack<Result> stackRes =  AE.getResults();
-        Iterator<Result> iter = stackRes.iterator();
-        AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
-        while(iter.hasNext()){
-            ObjectMessage message = new ObjectMessage(iter.next());
-            sendMessageWithRole(evalBufferAddress,message,manager);
-        }
-        
-        // launch other design agents
-        try {
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDSYNERGY,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDTOSMALLSAT,ManagerMode.ATEAM));
+            ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1));
+            AgentEvaluationCounter.getInstance();
+            
+            //initiate population and send to unevaluated buffer
+            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+            ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
+            AE.setPopulation(initPop);
+            AE.evaluatePopulation();
+            Stack<Result> stackRes =  AE.getResults();
+            Iterator<Result> iter = stackRes.iterator();
+            AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
+            while(iter.hasNext()){
+                ObjectMessage message = new ObjectMessage(iter.next());
+                sendMessageWithRole(evalBufferAddress,message,manager);
+            }
+            
+            // launch other design agents
+            try {
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDSYNERGY,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDTOSMALLSAT,ManagerMode.ATEAM));
 //            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ASKUSER,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.BESTNEIGHBOR,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.CROSSOVER,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.IMPROVEORBIT,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.MUTATION,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.RANDOMSEARCH,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEFROMBIGSAT,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEINTERFERENCE,ManagerMode.ATEAM));
-            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVESUPERFLUOUS,ManagerMode.ATEAM));
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(ATeamsManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        logger.info("All agents initiated. Starting search...");
-        
-        while(!isDone(AgentEvaluationCounter.getTotalEvals())){
-            pause(1);
-        }
-        System.out.println("Done");
-        System.out.println(AgentEvaluationCounter.getHashMap());
-        AgentEvaluationCounter.saveAgentStats(i);
-        
-        killAgentsInList(searchAgents);
-        killAgentsInList(bufferAgents);
-        killAgentsInList(ancillaryAgents);
-        
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.BESTNEIGHBOR,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.CROSSOVER,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.IMPROVEORBIT,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.MUTATION,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.RANDOMSEARCH,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEFROMBIGSAT,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVEINTERFERENCE,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.REMOVESUPERFLUOUS,ManagerMode.ATEAM));
+            } catch (Exception ex) {
+                Logger.getLogger(ATeamsManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            logger.info("All agents initiated. Starting search...");
+            
+            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+            }
+            System.out.println("Done");
+            System.out.println(AgentEvaluationCounter.getHashMap());
+            AgentEvaluationCounter.saveAgentStats(i);
+            
+            killAgentsInList(searchAgents);
+            killAgentsInList(bufferAgents);
+            killAgentsInList(ancillaryAgents);
+            
         }
     }
         
@@ -129,12 +124,12 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 400;
+        int evals = 2000;
     return n>=evals;
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){
-        Collection<AbstractAgent> agentList = new ArrayList<>();
+        Collection<AbstractAgent> agentList = new ArrayList();
         for(int i=1;i<=n;i++){
             agentList.add(launchAgent(agentClass,false));
         }
@@ -143,7 +138,7 @@ public class ATeamsManager extends DesignAgent{
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n,boolean gui){
-        Collection<AbstractAgent> agentList = new ArrayList<>();
+        Collection<AbstractAgent> agentList = new ArrayList();
         for(int i=1;i<=n;i++){
             agentList.add(launchAgent(agentClass,gui));
         }
@@ -163,7 +158,7 @@ public class ATeamsManager extends DesignAgent{
      * @throws InvocationTargetException 
      */
     private Collection<AbstractAgent> launchAgentsIntoLive(Class agentClass,int n,ModifyMode modMode,ManagerMode manMode) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-        Collection<AbstractAgent> agentList = new ArrayList<>();
+        Collection<AbstractAgent> agentList = new ArrayList();
         for(int i=1;i<=n;i++){
             Constructor cotr = agentClass.getConstructor(new Class[]{ModifyMode.class,ManagerMode.class});
             AbstractAgent agent = (AbstractAgent)cotr.newInstance(modMode,manMode);

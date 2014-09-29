@@ -43,15 +43,13 @@ public class Tradespace extends DesignAgent{
     protected void live(){
         while(isAlive()){
             Message mail = waitNextMessage();
-            switch(mail.getSender().getRole()){
-                case archSorter:
-                    ObjectMessage paretoMessage = (ObjectMessage)mail;
-                    updatePareto((ArchPopulation)paretoMessage.getContent());
-                    plotChart();
+            if(mail.getSender().getRole().equalsIgnoreCase(archSorter)){
+                ObjectMessage paretoMessage = (ObjectMessage)mail;
+                updatePareto((ArchPopulation)paretoMessage.getContent());
+                plotChart();
 //                    logger.info("plotting tradespace");
-                    break;
-                default: logger.warning("unknown sender");
-            }
+            }else
+                logger.warning("unknown sender");
         }
     }
     

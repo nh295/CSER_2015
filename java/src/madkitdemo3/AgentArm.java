@@ -8,6 +8,7 @@ package madkitdemo3;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import madkitdemo3.ModifyAgent.ModifyMode;
 import rbsa.eoss.Result;
 
 
@@ -22,19 +23,21 @@ public class AgentArm {
     private double playCount;
     private double avgReward;
     private double avgDev;
-    private LinkedList<Double> extremeValue = new LinkedList<>();
-    private LinkedList<Result> resultList = new LinkedList<>();
+    private LinkedList<Double> extremeValue = new LinkedList();
+    private LinkedList<Result> resultList = new LinkedList();
     private double maxDev;
     private int solutionDiversity;
     
     private final double delta;
     private final double lambda;
     private final String name;
+    private final ModifyMode mode;
     private final int window;
     
-    public AgentArm(String name,double delta, double lambda, int window){
+    public AgentArm(ModifyMode mode,double delta, double lambda, int window){
         reset();
-        this.name = name;
+        this.name = mode.toString();
+        this.mode = mode;
         this.delta = delta;
         this.lambda = lambda;
         this.window = window;
@@ -94,11 +97,11 @@ public class AgentArm {
      * @param data reward received after that play
      * @return true if PH test detects change 
      */
-    public boolean updateArm(AgentArmCredit data){
-        avgReward = (playCount*avgReward+data.getInstantReward())/(playCount+1);
+    public void updateArm(AgentArmCredit data){
+        avgReward = (playCount*avgReward+data.getInstantReward())/(AgentEvaluationCounter.getAgentEvals(mode));
         if(avgReward>getMaxQuality())
             setMaxQuality(avgReward);
-        playCount++;
+        playCount=AgentEvaluationCounter.getAgentEvals(mode);
         avgDev = avgDev + (avgReward-data.getInstantReward()+delta);
         maxDev = Math.max(maxDev, avgDev);
         
@@ -119,7 +122,9 @@ public class AgentArm {
             setMaxDiversity(solutionDiversity);
                 
         resultList.add(data.getNewRes());
-        
+    }
+    
+    public boolean PHtest(){
         return((maxDev - avgDev)>lambda);
     }
     
@@ -129,7 +134,7 @@ public class AgentArm {
         int dist = 0;
         
         for(int i=0;i<origBit.length;i++){
-            if(0!=Boolean.compare(origBit[i], newBit[i]))
+            if(origBit[i]!=newBit[i])
                 dist++;
         }
         return dist;
