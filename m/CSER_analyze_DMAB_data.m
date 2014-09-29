@@ -3,6 +3,7 @@ function CSER_analyze_DMAB_data
 path = 'C:\Users\Nozomi\Documents\CSER_2015';
 cd(path);
 
+javaaddpath('.\java\jess.jar');
 javaaddpath('.\java\jxl.jar');
 javaaddpath('./java/combinatoricslib-2.0.jar');
 javaaddpath('./java/commons-lang3-3.1.jar');

@@ -96,11 +96,11 @@ public class SearchPerformanceManager {
     public SearchPerformanceComparator loadSearchPerformanceComparatorFromFile( String filePath)
     {
         SearchPerformanceComparator res;
-        if( Params.path_save_results == null )
-        {
-            System.out.println( "The params class needs to be initialized" );
-            return null;
-        }
+//        if( Params.path_save_results == null )
+//        {
+//            System.out.println( "The params class needs to be initialized" );
+//            return null;
+//        }
         
         try {
             FileInputStream file = new FileInputStream( filePath );
