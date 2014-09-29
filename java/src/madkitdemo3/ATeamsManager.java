@@ -39,7 +39,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> searchAgents = new ArrayList();
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
-    private final int populationSize = 100;
+    private final int populationSize = 200;
     
     @Override
     protected void activate() {
@@ -100,6 +100,7 @@ public class ATeamsManager extends DesignAgent{
             logger.info("All agents initiated. Starting search...");
             
             while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+                pause(10);
             }
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
@@ -134,7 +135,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-        int evals = 100;
+        int evals = 2000;
     return n>=evals;
     }
     

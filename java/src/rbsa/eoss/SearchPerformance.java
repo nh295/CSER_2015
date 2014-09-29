@@ -104,6 +104,8 @@ public class SearchPerformance implements Serializable {
     }
     public int compareTo(SearchPerformance other) {
         if (other == null || other.getCheapest_max_benefit_arch() == null) return 1;
+        if(cheapest_max_benefit_arch==null)
+            System.out.println("hi");
         if (cheapest_max_benefit_arch.getCost() < other.getCheapest_max_benefit_arch().getCost())  {
             return 1;
         } else if (cheapest_max_benefit_arch.getCost() > other.getCheapest_max_benefit_arch().getCost())  {
