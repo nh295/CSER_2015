@@ -61,7 +61,7 @@ public class ArchSorter extends DesignAgent{
 //        AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
-            Message mail = waitNextMessage(100);
+            Message mail = waitNextMessage();
             if(mail!=null){
                 if(mail.getSender().getRole().equalsIgnoreCase(evaluatedBuffer)){
                     sp = new SearchPerformance();
@@ -86,6 +86,7 @@ public class ArchSorter extends DesignAgent{
                     spm.saveSearchPerformance(spTemp);
                     perfs.add(spTemp);
                     
+                    sendMessage(findAgent(COMMUNITY,aDesignTeam,manager),new Message());
                     AgentEvaluationCounter.incrementSPSave();
                 }else
                     logger.warning("unsupported sender: " + mail.getSender().getRole());

@@ -77,6 +77,9 @@ public class EvaluatedBuffer extends BufferAgent{
     }
     
     protected void end(){
+        AgentAddress paretoSorterAddress = findAgent(COMMUNITY, aDesignTeam, archSorter);
+        ObjectMessage paretoSortMail = new ObjectMessage(getCurrentPopulation());
+        sendMessage(paretoSorterAddress,paretoSortMail);
         System.out.println("Evaluated Arch Buffer dying");
     }
     

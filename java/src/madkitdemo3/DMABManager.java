@@ -42,7 +42,7 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxSPsave = 10;
+    private final int maxEvals = 2000;
     private Random rand = new Random();
     
     @Override
@@ -67,10 +67,10 @@ public class DMABManager extends DesignAgent{
     protected void live() {
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         AE.init(1);
-        AE.evalMinMax();
+//        AE.evalMinMax();
         AE.clear();
         for(int i=0;i<20;i++){
-            AE.init(3);
+//            AE.init(3);
              
             AgentEvaluationCounter.getInstance();
             AgentSelectionHistory.getInstance();
@@ -78,48 +78,50 @@ public class DMABManager extends DesignAgent{
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
             ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1,true));
             //set all agents to have sendProb of 1.0
-            this.setSendProb(1.0);
-            initSendProb(bufferAgents);
-            initSendProb(ancillaryAgents);
+//            this.setSendProb(1.0);
+//            initSendProb(bufferAgents);
+//            initSendProb(ancillaryAgents);
+//            
+//            //initiate population and send to unevaluated buffer
+//            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+//            if(initPop.size()!=populationSize)
+//                System.out.println("why population size not right?");
+//            AE.setPopulation(initPop);
+//            AE.evaluatePopulation();
+//            Stack<Result> stackRes =  AE.getResults();
+//            if(stackRes.size()!=populationSize)
+//                System.out.println("why population size not right?");
+//            Iterator<Result> iter = stackRes.iterator();
+//            AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
+//            while(iter.hasNext()){
+//                ObjectMessage message = new ObjectMessage(iter.next());
+//                sendMessageWithRole(evalBufferAddress,message,manager);
+//            }
+//            
+//            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+//                ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
+//                AgentSelectionHistory.addSelection(modMode);
+//                MultiAgentArms.setReady(false);
+//                
+//                try {
+//                    searchAgents = launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
+//                } catch (Exception ex) {
+//                    Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                while(!MultiAgentArms.isReady()){
+//                    pause(1);
+//                    //do nothing
+//                }
+//                if(MultiAgentArms.PHtest(modMode)) //do PH test
+//                    AgentSelectionHistory.incResetNum();
+//            }
             
-            //initiate population and send to unevaluated buffer
-            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            if(initPop.size()!=populationSize)
-                System.out.println("why population size not right?");
-            AE.setPopulation(initPop);
-            AE.evaluatePopulation();
-            Stack<Result> stackRes =  AE.getResults();
-            if(stackRes.size()!=populationSize)
-                System.out.println("why population size not right?");
-            Iterator<Result> iter = stackRes.iterator();
-            AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
-            while(iter.hasNext()){
-                ObjectMessage message = new ObjectMessage(iter.next());
-                sendMessageWithRole(evalBufferAddress,message,manager);
-            }
-            
-            while(!isDone(AgentEvaluationCounter.getSPSaveCount())){
-                ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
-                AgentSelectionHistory.addSelection(modMode);
-                MultiAgentArms.setReady(false);
-                
-                try {
-                    searchAgents = launchAgentsIntoLive(ModifyAgent.class,1,modMode,ManagerMode.DMABBANDIT);
-                } catch (Exception ex) {
-                    Logger.getLogger(DMABManager.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                while(!MultiAgentArms.isReady()){
-                    pause(1);
-                    //do nothing
-                }
-                if(MultiAgentArms.PHtest(modMode)) //do PH test
-                    AgentSelectionHistory.incResetNum();
-            }
-            
-            
-            
-            killAgent(ancillaryAgents.iterator().next(),1000);
-            killAgent(bufferAgents.iterator().next(),1000);
+            purgeMailbox();
+//            killAgent(bufferAgents.iterator().next(),1000);
+            killAgentsInList(bufferAgents);
+            waitNextMessage();
+            killAgentsInList(ancillaryAgents);
+//            killAgent(ancillaryAgents.iterator().next(),1000);
             
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
@@ -144,7 +146,7 @@ public class DMABManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-    return n>=maxSPsave;
+    return n>=maxEvals;
     }
     
     private ModifyMode selectOperator(int totalPlays){

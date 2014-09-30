@@ -40,7 +40,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxSPsave = 10;
+    private final int maxEval = 2000;
     
     @Override
     protected void activate() {
@@ -110,7 +110,7 @@ public class ATeamsManager extends DesignAgent{
             }
             logger.info("All agents initiated. Starting search...");
             
-            while(!isDone(AgentEvaluationCounter.getSPSaveCount())){
+            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
                 pause(10);
             }
             
@@ -121,9 +121,12 @@ public class ATeamsManager extends DesignAgent{
                 }
             }
             
-            killAgent(ancillaryAgents.iterator().next(),10000);
-            killAgent(bufferAgents.iterator().next(),10000);
-            
+            purgeMailbox();
+//            killAgent(bufferAgents.iterator().next(),1000);
+            killAgentsInList(bufferAgents);
+            waitNextMessage();
+            killAgentsInList(ancillaryAgents);
+//            killAgent(ancillaryAgents.iterator().next(),1000);
             
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
@@ -146,7 +149,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-    return n>=maxSPsave;
+    return n>=maxEval;
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){
