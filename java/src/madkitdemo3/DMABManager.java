@@ -42,7 +42,7 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxEvals = 2000;
+    private final int maxSPsave = 10;
     private Random rand = new Random();
     
     @Override
@@ -98,7 +98,7 @@ public class DMABManager extends DesignAgent{
                 sendMessageWithRole(evalBufferAddress,message,manager);
             }
             
-            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+            while(!isDone(AgentEvaluationCounter.getSPSaveCount())){
                 ModifyMode modMode = selectOperator(AgentEvaluationCounter.getTotalEvals());
                 AgentSelectionHistory.addSelection(modMode);
                 MultiAgentArms.setReady(false);
@@ -116,15 +116,10 @@ public class DMABManager extends DesignAgent{
                     AgentSelectionHistory.incResetNum();
             }
             
-            //count up the number of tiems the archSorter has saved performance 
-            int performanceSaveCount=0;
-            while(performanceSaveCount!=(populationSize)){
-                Message mail = waitNextMessage();
-                performanceSaveCount++;
-            }
             
-            killAgent(ancillaryAgents.iterator().next(),10000);
-            killAgent(bufferAgents.iterator().next(),10000);
+            
+            killAgent(ancillaryAgents.iterator().next(),1000);
+            killAgent(bufferAgents.iterator().next(),1000);
             
             System.out.println("Done");
             System.out.println(AgentEvaluationCounter.getHashMap());
@@ -149,7 +144,7 @@ public class DMABManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-    return n>=maxEvals;
+    return n>=maxSPsave;
     }
     
     private ModifyMode selectOperator(int totalPlays){

@@ -40,7 +40,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxEvals = 2000;
+    private final int maxSPsave = 10;
     
     @Override
     protected void activate() {
@@ -110,15 +110,8 @@ public class ATeamsManager extends DesignAgent{
             }
             logger.info("All agents initiated. Starting search...");
             
-            while(!isDone(AgentEvaluationCounter.getTotalEvals())){
+            while(!isDone(AgentEvaluationCounter.getSPSaveCount())){
                 pause(10);
-            }
-            
-            //count up the number of tiems the archSorter has saved performance 
-            int performanceSaveCount=0;
-            while(performanceSaveCount!=(populationSize)){
-                Message mail = waitNextMessage();
-                performanceSaveCount++;
             }
             
             for(AbstractAgent agent:searchAgents){
@@ -153,7 +146,7 @@ public class ATeamsManager extends DesignAgent{
     }
 
     private boolean isDone(int n){
-    return n>=maxEvals;
+    return n>=maxSPsave;
     }
     
     private Collection<AbstractAgent> launchAgentsIntoLive(String agentClass,int n){

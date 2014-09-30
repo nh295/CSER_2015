@@ -28,10 +28,14 @@ public class AgentEvaluationCounter {
     private static HashMap<ModifyMode,Integer> agentEvals;
     private static HashMap<ModifyMode,ArrayList<Integer>> dominanceHistory;
     private static int totalEval;
+    private static int archSortSaves;
+    
+    
     private AgentEvaluationCounter(){
         agentEvals = new HashMap();
         dominanceHistory =  new HashMap();
         totalEval = 0;
+        archSortSaves = 0;
     }
     
     public static AgentEvaluationCounter getInstance(){
@@ -67,6 +71,14 @@ public class AgentEvaluationCounter {
     public static HashMap<ModifyMode,Integer> getHashMap(){
         return agentEvals;
     }
+    
+   public static void incrementSPSave(){
+       archSortSaves++;
+   }
+   
+   public static int getSPSaveCount(){
+       return archSortSaves;
+   }
     
     public static void saveAgentStats(int i){
         try {

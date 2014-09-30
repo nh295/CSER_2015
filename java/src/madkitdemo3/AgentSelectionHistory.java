@@ -25,11 +25,13 @@ public class AgentSelectionHistory {
     private static AgentSelectionHistory ASH;
     private static ArrayList<ModifyMode> selectionHistory;
     private static int resetNum;
+    private static ArrayList<Integer> resetTime;
     private static final ModifyMode[] modeOptions = ModifyMode.values();
     
     private AgentSelectionHistory(){
         resetNum = 0;
         selectionHistory = new ArrayList();
+        resetTime = new ArrayList();
     }
     
     public static AgentSelectionHistory getInstance(){
@@ -83,6 +85,14 @@ public class AgentSelectionHistory {
     
     public static int getResetNum(){
         return resetNum;
+    }
+    
+    public static void setResetTime(int time){
+        resetTime.add(time);
+    }
+    
+    public static ArrayList<Integer> getResetTimes(){
+        return resetTime;
     }
     
     public static ModifyMode[] getModes(){
