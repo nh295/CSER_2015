@@ -39,7 +39,7 @@ for i =1:length(filename)
     end
 end
 avg_history = zeros(max_data_length,numAgents);
-
+resetCount = 0;
 for i=1:length(filename)
     history = agentData{i};
     for j = 1:history.size
@@ -49,9 +49,12 @@ for i=1:length(filename)
             end
         end
     end
+    resetCount = resetCount + history.getResetNum();
 end
 
 avg_history = avg_history/length(filename);
+avg_resetCount = resetCount/length(filename);
+fprintf('average reset count was %d',avg_resetCount);
 
 %all on one plot
 figure(1);

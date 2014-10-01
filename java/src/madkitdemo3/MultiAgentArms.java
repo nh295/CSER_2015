@@ -51,6 +51,7 @@ public class MultiAgentArms {
             while(iter.hasNext()){
                 arms.get(iter.next()).reset();
             }
+            AgentEvaluationCounter.resetPlay();
             AgentSelectionHistory.incResetNum();
             AgentSelectionHistory.setResetTime(AgentEvaluationCounter.getTotalEvals());
             return true;

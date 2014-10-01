@@ -61,7 +61,7 @@ public class ArchSorter extends DesignAgent{
 //        AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
-            Message mail = waitNextMessage();
+            Message mail = waitNextMessage(1000);
             if(mail!=null){
                 if(mail.getSender().getRole().equalsIgnoreCase(evaluatedBuffer)){
                     sp = new SearchPerformance();

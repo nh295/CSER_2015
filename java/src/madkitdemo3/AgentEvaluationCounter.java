@@ -26,6 +26,7 @@ import rbsa.eoss.local.Params;
 public class AgentEvaluationCounter {
     private static AgentEvaluationCounter AEC = null;
     private static HashMap<ModifyMode,Integer> agentEvals;
+    private static HashMap<ModifyMode,Integer> agentPlays;
     private static HashMap<ModifyMode,ArrayList<Integer>> dominanceHistory;
     private static int totalEval;
     private static int archSortSaves;
@@ -33,6 +34,7 @@ public class AgentEvaluationCounter {
     
     private AgentEvaluationCounter(){
         agentEvals = new HashMap();
+        agentPlays = new HashMap();
         dominanceHistory =  new HashMap();
         totalEval = 0;
         archSortSaves = 0;
@@ -47,6 +49,7 @@ public class AgentEvaluationCounter {
     
     public static void addStat(ModifyMode modMode, Result refRes, Result newRes){
         addEval(modMode);
+        addPlay(modMode);
         if(!dominanceHistory.containsKey(modMode))
             dominanceHistory.put(modMode,new ArrayList<Integer>());
         dominanceHistory.get(modMode).add(newRes.dominates(refRes));
@@ -60,12 +63,27 @@ public class AgentEvaluationCounter {
             agentEvals.put(modMode, 1);
     }
     
+    private static void addPlay(ModifyMode modMode){
+        if(agentPlays.containsKey(modMode))
+            agentPlays.put(modMode,agentPlays.get(modMode)+1);
+        else
+            agentPlays.put(modMode, 1);
+    }
+    
+    public static void resetPlay(){
+        agentPlays.clear();
+    }
+    
     public static int getTotalEvals(){
         return totalEval;
     }
     
     public static int getAgentEvals(ModifyMode modMode){
         return agentEvals.get(modMode);
+    }
+    
+    public static int getAgentPlayCount(ModifyMode modMode){
+        return agentPlays.get(modMode);
     }
     
     public static HashMap<ModifyMode,Integer> getHashMap(){
