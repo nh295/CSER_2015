@@ -40,7 +40,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxEval = 2000;
+    private final int maxEval = 1000;
     
     @Override
     protected void activate() {
@@ -66,7 +66,7 @@ public class ATeamsManager extends DesignAgent{
         AE.init(1);
         AE.evalMinMax();
         AE.clear();
-        for(int i=0;i<20;i++){
+        for(int i=0;i<10;i++){
             AgentEvaluationCounter.setNumIter(i);
             AE.init(11);
             

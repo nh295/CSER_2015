@@ -69,8 +69,8 @@ public class DMABManager extends DesignAgent{
         AE.init(1);
         AE.evalMinMax();
         AE.clear();
-        for(int i=0;i<20;i++){
-            AE.init(3);
+        for(int i=0;i<1;i++){
+            AE.init(11);
              
             AgentEvaluationCounter.getInstance();
             AgentSelectionHistory.getInstance();

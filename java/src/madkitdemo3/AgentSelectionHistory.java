@@ -53,7 +53,7 @@ public class AgentSelectionHistory {
             String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";
             FileOutputStream file = new FileOutputStream( file_path );
             ObjectOutputStream os = new ObjectOutputStream( file );
-            os.writeObject(selectionHistory);
+            os.writeObject(ASH);
             os.close();
             file.close();
         } catch (Exception e) {
@@ -61,17 +61,17 @@ public class AgentSelectionHistory {
         }
     }
     
-    public static ArrayList<ModifyMode> loadAgentStatFromFile(String filePath )
+    public static AgentSelectionHistory loadAgentStatFromFile(String filePath )
     {
-        ArrayList<ModifyMode> history;
+        AgentSelectionHistory history;
         try {
             FileInputStream file = new FileInputStream( filePath );
             ObjectInputStream is = new ObjectInputStream( file );
-            history = (ArrayList<ModifyMode>)is.readObject();
+            history = (AgentSelectionHistory)is.readObject();
             is.close();
             file.close();
-            selectionHistory = history;
-            return history;
+            ASH = history;
+            return ASH;
         } catch (Exception e) {
             System.out.println( "The stats for agents is not found" );
             System.out.println( e.getMessage() );

@@ -24,7 +24,5 @@ end
 
 avgFinalDist = mean(finalDist)
 stdDevFinalDist = std(finalDist)
-avgFinalCost = mean(finalLowestCost)
-stdDevFinalCost = std(finalLowestCost)
-avgFinalScience = mean(finalLowestCostScience)
-stdFinalScience = std(finalLowestCostScience)
+avgFinalCost = finalLowestCost/length(filename);
+avgFinalScience = finalLowestCostScience/length(filename);

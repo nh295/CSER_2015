@@ -100,6 +100,7 @@ public class ArchSorter extends DesignAgent{
         logger.info(Long.toString(time)+": evals="+AgentEvaluationCounter.getTotalEvals());
         SearchPerformanceComparator spc = new SearchPerformanceComparator(perfs);
         spm.saveSearchPerformanceComparator(spc);
+        AgentEvaluationCounter.setSorterDead();
         System.out.println("ArchSorter saving and dying");
     }
 //    /**

@@ -1,6 +1,7 @@
 function CSER_analyze_DMAB_data
 
-path = 'C:\Users\Nozomi\Documents\CSER_2015';
+% path = 'C:\Users\Nozomi\Documents\CSER_2015';
+path = 'C:\Users\SEAK1\Nozomi\CSER_2015';
 cd(path);
 
 javaaddpath('.\java\jess.jar');
