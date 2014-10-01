@@ -6,6 +6,7 @@
 
 package madkitdemo3;
 
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -147,9 +148,23 @@ public class ModifyAgent extends DesignAgent{
                     Result res =  evaluate(iter.next());
                     sendResultToAgentWithRole(COMMUNITY,aDesignTeam,evaluatedBuffer,res,modifier);
                     AgentEvaluationCounter.addStat(modMode,ref.getResult(),res);        
+                    AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
                     if(manMode==ManagerMode.DMABBANDIT){
-                        AgentArmCredit data = new AgentArmCredit(ref.getResult(),res);
                         MultiAgentArms.updateArm(modMode, data);
+                    }
+                    if(modMode == ModifyMode.ASKUSER){
+                        logger.info("User asked to improve arch:");
+                        logger.info(ref.toString());
+                        logger.info("Before improvement had science: " + ref.getResult().getScience() + " and cost: " + ref.getResult().getCost());
+                        logger.info("User modified arch:");
+                        logger.info(res.getArch().toString());
+                        logger.info("After improving, science: " + res.getScience() + " and cost: " + res.getCost());
+                        if(data.getInstantReward()==-1)
+                            logger.info("WORSE: Improved architecture is dominated by original");
+                        else if(data.getInstantReward()==1)
+                            logger.info("BETTER: Improved architecture dominates original");
+                        else
+                            logger.info("SAME: Improved architecture neither dominates or is dominated by original");
                     }
                 }
             }
@@ -222,6 +237,7 @@ public class ModifyAgent extends DesignAgent{
         return out;
     }
     private ArrayList<Architecture> askUser(Architecture orig){
+        Toolkit.getDefaultToolkit().beep();
         Architecture modifiedArch = orig.askUserToImprove();
         ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
