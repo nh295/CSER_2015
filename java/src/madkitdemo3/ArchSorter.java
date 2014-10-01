@@ -61,7 +61,7 @@ public class ArchSorter extends DesignAgent{
 //        AgentAddress tradespaceAddress = findAgent(COMMUNITY, aDesignTeam, tradespace);
         
         while(isAlive() && !endLive){
-            Message mail = waitNextMessage();
+            Message mail = waitNextMessage(100);
             if(mail!=null){
                 if(mail.getSender().getRole().equalsIgnoreCase(evaluatedBuffer)){
                     sp = new SearchPerformance();
@@ -98,9 +98,10 @@ public class ArchSorter extends DesignAgent{
     protected void end(){
         long time = System.currentTimeMillis();
         logger.info(Long.toString(time)+": evals="+AgentEvaluationCounter.getTotalEvals());
-        SearchPerformanceComparator spc = new SearchPerformanceComparator(perfs);
+        SearchPerformanceComparator spc = new SearchPerformanceComparator(Integer.toString(AgentEvaluationCounter.getNumIter()),perfs);
         spm.saveSearchPerformanceComparator(spc);
         System.out.println("ArchSorter saving and dying");
+        AgentEvaluationCounter.setSorterDead();
     }
 //    /**
 //     * 

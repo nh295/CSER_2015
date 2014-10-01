@@ -67,7 +67,7 @@ public class ATeamsManager extends DesignAgent{
         AE.evalMinMax();
         AE.clear();
         for(int i=0;i<20;i++){
-            
+            AgentEvaluationCounter.setNumIter(i);
             AE.init(11);
             
             // initialize buffer agents
@@ -126,6 +126,8 @@ public class ATeamsManager extends DesignAgent{
             killAgentsInList(bufferAgents);
             waitNextMessage();
             killAgentsInList(ancillaryAgents);
+            while(!AgentEvaluationCounter.isSorterDead())
+                pause(1000);
 //            killAgent(ancillaryAgents.iterator().next(),1000);
             
             System.out.println("Done");
