@@ -428,7 +428,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
             String orb = Params.orbit_list[o];
             String[] payls = this.getPayloadInOrbit(orb);
             if(payls!=null) {
-                ret = ret + " " + orb + ": " + StringUtils.join(payls, " ") + "; ";
+                ret = ret + "\n" + orb + ": " + StringUtils.join(payls, " ") ;
             }
             
         }
@@ -1079,13 +1079,17 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
         //System.out.println("askUserToImprove");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
-        System.out.println("Current arch is " + this.toString() + ".\n How can I improve this architecture?");
+        System.out.println("Current arch is " + this.toString() + ".\n"
+                + "Has science score: " + this.getResult().getScience() +
+                "and has cost: " + this.getResult().getCost() + ".\n How can I improve this architecture?");
         HashMap<String,String[]> mapping= new HashMap<String,String[]>();
+        int numInsAdded = 0;
         for (String orb:Params.orbit_list) {    
             try {
                 boolean valid = false;
                 String input = "";
                 while(!valid) {
+                    System.out.println("Added "+numInsAdded+" instruments");
                     System.out.println("New payload in " + orb + "? ");
                     input = bufferedReader.readLine();
                     String[] instruments = input.split(" ");
@@ -1104,6 +1108,7 @@ public class Architecture implements Comparable<Architecture>, java.io.Serializa
                         }
                     }
                 }    
+                numInsAdded+=input.split(" ").length;
                 mapping.put(orb,input.split(" "));
             } catch (Exception e) {
                 System.out.println("EXC in askUserToImprove" + e.getMessage() + " " + e.getClass());

@@ -42,7 +42,7 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxEvals = 2000;
+    private final int maxEvals = 1000;
     private Random rand = new Random();
     
     @Override
@@ -60,7 +60,7 @@ public class DMABManager extends DesignAgent{
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
-        MultiAgentArms.init(modes,0.3,1,5);
+        MultiAgentArms.init(modes,0.3,1,10);
     }
         
     @Override
@@ -159,7 +159,7 @@ public class DMABManager extends DesignAgent{
         if(totalPlayCount == 0 || totalPlayCount==1)
             totalPlayCount = 1.000001;
         for(ModifyMode mode:ModifyMode.values()){
-            if(mode!=ModifyMode.ASKUSER){
+            if(mode!=ModifyMode.ASKUSER&&mode!=ModifyMode.BESTNEIGHBOR){
                 double p = MultiAgentArms.getAvgValues(mode);
                 if(Double.isNaN(p))
                     p=0;
@@ -171,7 +171,7 @@ public class DMABManager extends DesignAgent{
             }
         }
         for(ModifyMode mode:ModifyMode.values()){
-            if(mode==ModifyMode.ASKUSER)
+            if(mode==ModifyMode.ASKUSER || mode==ModifyMode.BESTNEIGHBOR)
                 break;
             if(scores.get(mode)==max){
                 potentialModes.add(mode);

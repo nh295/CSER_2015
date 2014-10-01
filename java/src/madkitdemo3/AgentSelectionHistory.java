@@ -79,6 +79,24 @@ public class AgentSelectionHistory {
         }
     }
     
+    public static ArrayList<Integer> loadArmResets(String filePath )
+    {
+        ArrayList<Integer> resetTimes;
+        try {
+            FileInputStream file = new FileInputStream( filePath );
+            ObjectInputStream is = new ObjectInputStream( file );
+            resetTimes = (ArrayList<Integer>)is.readObject();
+            is.close();
+            file.close();
+            resetTime = resetTimes;
+            return resetTimes;
+        } catch (Exception e) {
+            System.out.println( "The stats for agents is not found" );
+            System.out.println( e.getMessage() );
+            return null;
+        }
+    }
+    
     public static void incResetNum(){
         resetNum++;
     }

@@ -49,12 +49,12 @@ for i=1:length(filename)
             end
         end
     end
-    resetCount = resetCount + history.getResetNum();
+%     resetCount = resetCount + history.getResetNum();
 end
 
 avg_history = avg_history/length(filename);
-avg_resetCount = resetCount/length(filename);
-fprintf('average reset count was %d',avg_resetCount);
+% avg_resetCount = resetCount/length(filename);
+% fprintf('average reset count was %d',avg_resetCount);
 
 %all on one plot
 figure(1);
@@ -63,6 +63,9 @@ pattern = {'-b','-g','-r','-c','-m','-k',...
            ':b',':g',':r',':c',':m',':k'};
 for i=1:numAgents
     plot(avg_history(:,i),pattern{i});
+    disp(char(modes(i)))
+    disp(mean(avg_history(:,i)))
+    disp(std(avg_history(:,i)))
     labels{i}=char(modes(i));
 end
 legend(labels);
@@ -73,6 +76,7 @@ for i=1:numAgents
     subplot(numAgents,1,i)
      plot(avg_history(:,i))
     legend(char(modes(i)));
+    axis([0,1400,0,1]);
 end
 
 
