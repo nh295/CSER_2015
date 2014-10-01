@@ -5,28 +5,23 @@ import agentIterfaces.*
 import java.io.*;
 
 [filename, pathname, filterindex] = uigetfile('*.rs', 'Pick a results file','MultiSelect','on');
+
+finalDist = 0;
+finalLowestCost = 0;
+finalLowestCostScience = 0;
 spm = SearchPerformanceManager.getInstance;
-spc = spm.loadSearchPerformanceComparatorFromFile(strcat(pathname,filename));
 
-distIter = spc.getAvg_pareto_distances.iterator;
-distHist = zeros(spc.getAvg_pareto_distances.size,1);
-j = 1;
-while(distIter.hasNext)
-    distHist(j)=distIter.next;
-    j = j + 1;
+for i=1:length(filename)
+    spc = spm.loadSearchPerformanceComparatorFromFile(strcat(pathname,filename{i}));
+    
+    distSize = spc.getAvg_pareto_distances.size;
+    finalDist = finalDist + spc.getAvg_pareto_distances.get(distSize-1);
+
+    costSize= spc.getLowest_cost_max_science_arch.size;
+    finalLowestCost = finalLowestCost + spc.getLowest_cost_max_science_arch.get(costSize-1).getResult.getCost;
+    finalLowestCostScience = finalLowestCostScience + spc.getLowest_cost_max_science_arch.get(costSize-1).getResult.getScience;
 end
 
-figure(1)
-plot(distHist);
-
-
-lowestCostArchIter = spc.getLowest_cost_max_science_arch.iterator;
-lowestCostHist = zeros(spc.getLowest_cost_max_science_arch.size,1);
-j = 1;
-while(lowestCostArchIter.hasNext)
-    lowestCostHist(j)=lowestCostArchIter.next.getResult.getCost;
-    j = j + 1;
-end
-
-figure(2)
-plot(lowestCostHist);
+avgFinalDist = finalDist/length(filename);
+avgFinalCost = finalLowestCost/length(filename);
+avgFinalScience = finalLowestCostScience/length(filename);

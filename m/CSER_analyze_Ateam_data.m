@@ -20,7 +20,7 @@ disp('Choose agent stat files');
 
 
 if(~iscell(filename))
-    agentData = collectAgentData(strcat(pathname,filename));
+    [agentData,agentNames] = collectAgentData(strcat(pathname,filename));
 else
     agentData = cell(length(filename),1);
     for i=1:length(filename)

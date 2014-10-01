@@ -98,10 +98,10 @@ public class AgentArm {
      * @return true if PH test detects change 
      */
     public void updateArm(AgentArmCredit data){
-        avgReward = (playCount*avgReward+data.getInstantReward())/(AgentEvaluationCounter.getAgentEvals(mode));
+        avgReward = (playCount*avgReward+data.getInstantReward())/(AgentEvaluationCounter.getAgentPlayCount(mode));
         if(avgReward>getMaxQuality())
             setMaxQuality(avgReward);
-        playCount=AgentEvaluationCounter.getAgentEvals(mode);
+        playCount=AgentEvaluationCounter.getAgentPlayCount(mode);
         avgDev = avgDev + (avgReward-data.getInstantReward()+delta);
         maxDev = Math.max(maxDev, avgDev);
         
