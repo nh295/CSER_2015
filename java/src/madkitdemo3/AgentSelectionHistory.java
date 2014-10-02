@@ -24,28 +24,24 @@ import rbsa.eoss.local.Params;
  */
 public class AgentSelectionHistory implements Serializable{
     private static AgentSelectionHistory ASH;
-    private static ArrayList<ModifyMode> selectionHistory;
-    private static int resetNum;
-    private static ArrayList<Integer> resetTime;
+    private static SelectionData data;
     private static final ModifyMode[] modeOptions = ModifyMode.values();
     
     private AgentSelectionHistory(){
-        resetNum = 0;
-        selectionHistory = new ArrayList();
-        resetTime = new ArrayList();
+        data = new SelectionData();
     }
     
     public static AgentSelectionHistory getInstance(){
         if(ASH==null){
             ASH = new AgentSelectionHistory();
-            return new AgentSelectionHistory();
+            return ASH;
         }
         else
             return ASH;
     }
     
     public static void addSelection(ModifyMode mode){
-        selectionHistory.add(mode);
+        data.addSelection(mode);
     }
     
     public static void saveSelectionHistory(int iteration){
@@ -56,7 +52,7 @@ public class AgentSelectionHistory implements Serializable{
             String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";
             FileOutputStream file = new FileOutputStream( file_path );
             ObjectOutputStream os = new ObjectOutputStream( file );
-            os.writeObject(ASH);
+            os.writeObject(data);
             os.close();
             file.close();
         } catch (Exception e) {
@@ -64,17 +60,17 @@ public class AgentSelectionHistory implements Serializable{
         }
     }
     
-    public static AgentSelectionHistory loadAgentStatFromFile(String filePath )
+    public static SelectionData loadSelectionHistoryFromFile(String filePath )
     {
-        AgentSelectionHistory history;
+        SelectionData history;
         try {
             FileInputStream file = new FileInputStream( filePath );
             ObjectInputStream is = new ObjectInputStream( file );
-            history = (AgentSelectionHistory)is.readObject();
+            history = (SelectionData)is.readObject();
             is.close();
             file.close();
-            ASH = history;
-            return ASH;
+            data = history;
+            return data;
         } catch (Exception e) {
             System.out.println( "The history for agents is not found" );
             System.out.println( e.getMessage() );
@@ -82,38 +78,20 @@ public class AgentSelectionHistory implements Serializable{
         }
     }
     
-    public static ArrayList<Integer> loadArmResets(String filePath )
-    {
-        ArrayList<Integer> resetTimes;
-        try {
-            FileInputStream file = new FileInputStream( filePath );
-            ObjectInputStream is = new ObjectInputStream( file );
-            resetTimes = (ArrayList<Integer>)is.readObject();
-            is.close();
-            file.close();
-            resetTime = resetTimes;
-            return resetTimes;
-        } catch (Exception e) {
-            System.out.println( "The number of resets is not found" );
-            System.out.println( e.getMessage() );
-            return null;
-        }
-    }
-    
     public static void incResetNum(){
-        resetNum++;
+        data.incResetNum();
     }
     
     public static int getResetNum(){
-        return resetNum;
+        return data.getResetNum();
     }
     
     public static void setResetTime(int time){
-        resetTime.add(time);
+        data.setResetTime(time);
     }
     
     public static ArrayList<Integer> getResetTimes(){
-        return resetTime;
+        return data.getResetTimes();
     }
     
     public static ModifyMode[] getModes(){
@@ -122,6 +100,39 @@ public class AgentSelectionHistory implements Serializable{
     
     public static void reset(){
         ASH = new AgentSelectionHistory();
+    }
+    
+    public class SelectionData implements Serializable{
+        
+        private ArrayList<ModifyMode> selectionHistory;
+        private int resetNum;
+        private ArrayList<Integer> resetTime;
+        
+        public SelectionData(){
+            resetNum = 0;
+            selectionHistory = new ArrayList();
+            resetTime = new ArrayList();
+        }
+        
+        public void addSelection(ModifyMode mode){
+            selectionHistory.add(mode);
+        }
+        
+        public void incResetNum(){
+            resetNum++;
+        }
+        
+        public int getResetNum(){
+            return resetNum;
+        }
+        
+        public void setResetTime(int time){
+            resetTime.add(time);
+        }
+        
+        public ArrayList<Integer> getResetTimes(){
+            return resetTime;
+        }
     }
     
 }

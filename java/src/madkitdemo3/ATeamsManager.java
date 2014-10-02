@@ -27,6 +27,8 @@ import rbsa.eoss.Architecture;
 import rbsa.eoss.ArchitectureEvaluator;
 import rbsa.eoss.ArchitectureGenerator;
 import rbsa.eoss.Result;
+import rbsa.eoss.ResultCollection;
+import rbsa.eoss.ResultManager;
 import rbsa.eoss.SearchPerformance;
 
 
@@ -39,6 +41,8 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> searchAgents = new ArrayList();
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
+    private final boolean continueFromHumanMode = false;
+    private ResultManager RM;
     private final int populationSize = 200;
     private final int maxEval = 1000;
     
@@ -58,6 +62,7 @@ public class ATeamsManager extends DesignAgent{
         initSendProb(ancillaryAgents);
         initSendProb(searchAgents);
         
+        RM = ResultManager.getInstance();
     }
         
     @Override
@@ -67,20 +72,29 @@ public class ATeamsManager extends DesignAgent{
         AE.evalMinMax();
         AE.clear();
         for(int i=0;i<10;i++){
+            AgentEvaluationCounter.getInstance();
             AgentEvaluationCounter.setNumIter(i);
             AE.init(11);
             
             // initialize buffer agents
             bufferAgents.addAll(launchAgentsIntoLive(EvaluatedBuffer.class.getName(),1,true));
             ancillaryAgents.addAll(launchAgentsIntoLive(ArchSorter.class.getName(),1,true));
-            AgentEvaluationCounter.getInstance();
             
-            //initiate population and send to unevaluated buffer
-            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            AE.setPopulation(initPop);
-            AE.evaluatePopulation();
-            Stack<Result> stackRes =  AE.getResults();
+            Stack<Result> stackRes;
+            if(continueFromHumanMode){
+                ResultCollection rescol = RM.loadResultCollectionFromFile(evaluator);
+                stackRes = rescol.getResults();
+                AgentEvaluationCounter.loadAgentStatFromFile(evaluator);
+            }
+            else{
+                //initiate population and send to unevaluated buffer
+                ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+                initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+                AE.setPopulation(initPop);
+                AE.evaluatePopulation();
+                stackRes =  AE.getResults();
+            }
+            
             Iterator<Result> iter = stackRes.iterator();
             AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
             while(iter.hasNext()){

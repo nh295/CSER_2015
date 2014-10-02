@@ -42,7 +42,7 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxEvals = 1000;
+    private final int maxEvals = 20;
     private Random rand = new Random();
     
     @Override
