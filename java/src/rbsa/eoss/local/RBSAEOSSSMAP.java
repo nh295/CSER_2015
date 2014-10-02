@@ -4,6 +4,7 @@
  */
 package rbsa.eoss.local;
 
+import madkitdemo3.PracticeManager;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -275,8 +276,12 @@ public class RBSAEOSSSMAP {
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
                 kernel= new Madkit("--launchAgents",DMABManager.class.getName() + ",true,1;");
                 break;
+            case 12: //user practice mode
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
+                kernel= new Madkit("--launchAgents",PracticeManager.class.getName() + ",true,1;");
+                break;
             default:
-                System.out.println("Choose a mode between 1 and 11");
+                System.out.println("Choose a mode between 1 and 12");
         }
         
     }

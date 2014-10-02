@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +22,7 @@ import rbsa.eoss.local.Params;
  *
  * @author Nozomi
  */
-public class AgentSelectionHistory {
+public class AgentSelectionHistory implements Serializable{
     private static AgentSelectionHistory ASH;
     private static ArrayList<ModifyMode> selectionHistory;
     private static int resetNum;
@@ -35,8 +36,10 @@ public class AgentSelectionHistory {
     }
     
     public static AgentSelectionHistory getInstance(){
-        if(ASH==null)
+        if(ASH==null){
+            ASH = new AgentSelectionHistory();
             return new AgentSelectionHistory();
+        }
         else
             return ASH;
     }
@@ -73,7 +76,7 @@ public class AgentSelectionHistory {
             ASH = history;
             return ASH;
         } catch (Exception e) {
-            System.out.println( "The stats for agents is not found" );
+            System.out.println( "The history for agents is not found" );
             System.out.println( e.getMessage() );
             return null;
         }
@@ -91,7 +94,7 @@ public class AgentSelectionHistory {
             resetTime = resetTimes;
             return resetTimes;
         } catch (Exception e) {
-            System.out.println( "The stats for agents is not found" );
+            System.out.println( "The number of resets is not found" );
             System.out.println( e.getMessage() );
             return null;
         }
