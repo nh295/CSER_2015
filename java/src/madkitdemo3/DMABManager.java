@@ -60,13 +60,14 @@ public class DMABManager extends DesignAgent{
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
-        MultiAgentArms.init(modes,0.1,1,10);
+        MultiAgentArms.init(modes,0.1,5,5);
     }
         
     @Override
     protected void live() {
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         AE.init(1);
+        System.out.println("Evaluating Min Max");
         AE.evalMinMax();
         AE.clear();
         for(int i=0;i<10;i++){
@@ -85,6 +86,7 @@ public class DMABManager extends DesignAgent{
             //initiate population and send to unevaluated buffer
             ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
             AE.setPopulation(initPop);
+            System.out.println("Evaluating Initial Population");
             AE.evaluatePopulation();
             Stack<Result> stackRes =  AE.getResults();
             Iterator<Result> iter = stackRes.iterator();

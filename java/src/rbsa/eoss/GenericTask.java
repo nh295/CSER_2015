@@ -52,11 +52,11 @@ public class GenericTask implements Callable {
     }
     @Override
     public Result call()
-    {   System.out.println("Evaluating Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " ... " );
+    {   //System.out.println("Evaluating Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " ... " );
         
         if (!arch.isFeasibleAssignment()) {
             int diff = arch.getTotalInstruments() - Params.MAX_TOTAL_INSTR;
-            System.out.println("Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " is infeasible by " + diff);
+            //System.out.println("Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " is infeasible by " + diff);
             return new Result(arch, 0.0, 1E5, null, null, null, null, null,null);
         }
     
@@ -90,7 +90,7 @@ public class GenericTask implements Callable {
             resu.setTaskType(type);
             arch.setResult(resu);
             
-            System.out.println("Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " " + resu.getTaskType() + ": Science = " + resu.getScience() + "; Cost = " + resu.getCost());
+            //System.out.println("Arch " + arch.toBitString() + " nsats = " + arch.getNsats() + " " + resu.getTaskType() + ": Science = " + resu.getScience() + "; Cost = " + resu.getCost());
         } catch (Exception e) {
             System.out.println( "EXC in Task:call: " + e.getClass() + " " + e.getMessage() + " " + e.getStackTrace() );
             freeResource();

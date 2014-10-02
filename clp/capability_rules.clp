@@ -13,7 +13,7 @@
     (DATABASE::Instrument (Name ?ins) (Illumination Passive) (Spectral-region ?sr))
     (test (eq (sub-string 1 (min (str-length ?sr) 3) ?sr) "opt"))
     =>
-    (printout t cannot-measure-in-dark " " ?ins " " ?sr crlf)
+    ;(printout t cannot-measure-in-dark " " ?ins " " ?sr crlf)
     (modify ?c (can-take-measurements no) (reason "Passive optical instruments cannot take their measurements in DD RAANs"))
     )
 
@@ -87,7 +87,7 @@
     (bind ?dc (min 1.0 (/ (* 1 7 60 500 (/ 1 8192)) ?rbo))); you get 1 7' pass at 500Mbps max
     (modify ?l1 (data-rate-duty-cycle# ?dc) (reason "Cumulative spacecraft data rate cannot be downloaded to ground stations"))
 	(modify ?i1 (data-rate-duty-cycle# ?dc) )
-    (if (< ?dc 1.0) then (printout t "resource-limitations-datarate " ?ins1 " dc = " ?dc crlf))
+    ;(if (< ?dc 1.0) then (printout t "resource-limitations-datarate " ?ins1 " dc = " ?dc crlf))
     )
 
 (defrule CAPABILITIES::resource-limitations-power
@@ -99,7 +99,7 @@
     (bind ?dc (min 1.0 (/ 10000 ?pow)))
     (modify ?l1 (power-duty-cycle# ?dc) (reason "Cumulative spacecraft power exceeds 10kW"))
 	(modify ?i1 (power-duty-cycle# ?dc) )
-    (if (< ?dc 1.0) then (printout t "resource-limitations-power " ?ins1 " dc = " ?dc crlf))
+    ;(if (< ?dc 1.0) then (printout t "resource-limitations-power " ?ins1 " dc = " ?dc crlf))
     )
         
 ;(defrule CAPABILITIES::get-instrument-revisit-times-from-database
