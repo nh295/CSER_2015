@@ -7,7 +7,7 @@ import java.io.*;
 [filename, pathname, filterindex] = uigetfile('*.rs', 'Pick a results file','MultiSelect','on');
 
 finalDist = zeros(length(filename),1);
-finalLowestCost = zeros(length(filename),1);
+finalLowestCost =  zeros(length(filename),1);
 finalLowestCostScience = zeros(length(filename),1);
 spm = SearchPerformanceManager.getInstance;
 

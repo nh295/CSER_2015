@@ -60,7 +60,7 @@ public class DMABManager extends DesignAgent{
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
-        MultiAgentArms.init(modes,0.3,1,10);
+        MultiAgentArms.init(modes,0.1,1,10);
     }
         
     @Override
@@ -69,8 +69,8 @@ public class DMABManager extends DesignAgent{
         AE.init(1);
         AE.evalMinMax();
         AE.clear();
-        for(int i=0;i<20;i++){
-            AE.init(3);
+        for(int i=0;i<10;i++){
+            AE.init(11);
              
             AgentEvaluationCounter.getInstance();
             AgentSelectionHistory.getInstance();
@@ -84,13 +84,9 @@ public class DMABManager extends DesignAgent{
             
             //initiate population and send to unevaluated buffer
             ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            if(initPop.size()!=populationSize)
-                System.out.println("why population size not right?");
             AE.setPopulation(initPop);
             AE.evaluatePopulation();
             Stack<Result> stackRes =  AE.getResults();
-            if(stackRes.size()!=populationSize)
-                System.out.println("why population size not right?");
             Iterator<Result> iter = stackRes.iterator();
             AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
             while(iter.hasNext()){

@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +22,7 @@ import rbsa.eoss.local.Params;
  *
  * @author Nozomi
  */
-public class AgentSelectionHistory {
+public class AgentSelectionHistory implements Serializable{
     private static AgentSelectionHistory ASH;
     private static ArrayList<ModifyMode> selectionHistory;
     private static int resetNum;
@@ -35,8 +36,10 @@ public class AgentSelectionHistory {
     }
     
     public static AgentSelectionHistory getInstance(){
-        if(ASH==null)
+        if(ASH==null){
+            ASH = new AgentSelectionHistory();
             return new AgentSelectionHistory();
+        }
         else
             return ASH;
     }
@@ -53,7 +56,7 @@ public class AgentSelectionHistory {
             String file_path = Params.path_save_results + "\\" + name + "_" + stamp + ".rs";
             FileOutputStream file = new FileOutputStream( file_path );
             ObjectOutputStream os = new ObjectOutputStream( file );
-            os.writeObject(selectionHistory);
+            os.writeObject(ASH);
             os.close();
             file.close();
         } catch (Exception e) {
@@ -61,19 +64,19 @@ public class AgentSelectionHistory {
         }
     }
     
-    public static ArrayList<ModifyMode> loadAgentStatFromFile(String filePath )
+    public static AgentSelectionHistory loadAgentStatFromFile(String filePath )
     {
-        ArrayList<ModifyMode> history;
+        AgentSelectionHistory history;
         try {
             FileInputStream file = new FileInputStream( filePath );
             ObjectInputStream is = new ObjectInputStream( file );
-            history = (ArrayList<ModifyMode>)is.readObject();
+            history = (AgentSelectionHistory)is.readObject();
             is.close();
             file.close();
-            selectionHistory = history;
-            return history;
+            ASH = history;
+            return ASH;
         } catch (Exception e) {
-            System.out.println( "The stats for agents is not found" );
+            System.out.println( "The history for agents is not found" );
             System.out.println( e.getMessage() );
             return null;
         }
@@ -91,7 +94,7 @@ public class AgentSelectionHistory {
             resetTime = resetTimes;
             return resetTimes;
         } catch (Exception e) {
-            System.out.println( "The stats for agents is not found" );
+            System.out.println( "The number of resets is not found" );
             System.out.println( e.getMessage() );
             return null;
         }

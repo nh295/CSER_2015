@@ -7,9 +7,13 @@
 package madkitdemo3;
 
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Level;
@@ -20,6 +24,7 @@ import static madkitdemo3.Society.*;
 import rbsa.eoss.Architecture;
 import rbsa.eoss.ArchitectureEvaluator;
 import rbsa.eoss.Result;
+import rbsa.eoss.local.Params;
 
 
 
@@ -153,18 +158,19 @@ public class ModifyAgent extends DesignAgent{
                         MultiAgentArms.updateArm(modMode, data);
                     }
                     if(modMode == ModifyMode.ASKUSER){
-                        logger.info("User asked to improve arch:");
+                        logger.info("\n\nUser asked to improve arch:");
                         logger.info(ref.toString());
                         logger.info("Before improvement had science: " + ref.getResult().getScience() + " and cost: " + ref.getResult().getCost());
                         logger.info("User modified arch:");
                         logger.info(res.getArch().toString());
                         logger.info("After improving, science: " + res.getScience() + " and cost: " + res.getCost());
-                        if(data.getInstantReward()==-1)
-                            logger.info("WORSE: Improved architecture is dominated by original");
-                        else if(data.getInstantReward()==1)
-                            logger.info("BETTER: Improved architecture dominates original");
+                        int dom = res.dominates(ref.getResult());
+                        if(dom==-1)
+                            logger.info("WORSE: Improved architecture is dominated by original\n\n");
+                        else if(dom==1)
+                            logger.info("BETTER: Improved architecture dominates original\n\n");
                         else
-                            logger.info("SAME: Improved architecture neither dominates or is dominated by original");
+                            logger.info("SAME: Improved architecture neither dominates or is dominated by original\n\n");
                     }
                 }
             }
@@ -238,7 +244,7 @@ public class ModifyAgent extends DesignAgent{
     }
     private ArrayList<Architecture> askUser(Architecture orig){
         Toolkit.getDefaultToolkit().beep();
-        Architecture modifiedArch = orig.askUserToImprove();
+        Architecture modifiedArch = askUserToImprove(orig);
         ArrayList<Architecture> out = new ArrayList();
         out.add(modifiedArch);
         return out;
@@ -264,5 +270,49 @@ public class ModifyAgent extends DesignAgent{
         else if((x1<=0 && x2>=0) && !(x1==0 && x2==0))
             return -1; //a2 dominates a1
         else return 0; //neither architecture dominates the other
+    }
+    
+    private Architecture askUserToImprove(Architecture orig) {
+        //System.out.println("askUserToImprove");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+
+        logger.info("Current arch is " + orig.toString() + ".\n"
+                + "Has science score: " + orig.getResult().getScience() +
+                "and has cost: " + orig.getResult().getCost() + ".\n How can I improve this architecture?");
+        HashMap<String,String[]> mapping= new HashMap<String,String[]>();
+        int numInsAdded = 0;
+        for (String orb:Params.orbit_list) {    
+            try {
+                boolean valid = false;
+                String input = "";
+                while(!valid) {
+                    logger.info("Added "+numInsAdded+" instruments");
+                    logger.info("New payload in " + orb + "? ");
+                    input = bufferedReader.readLine();
+                    String[] instruments = input.split(" ");
+                    ArrayList<String> validInstruments = new ArrayList<String>();
+                    validInstruments.addAll(Arrays.asList(Params.instrument_list));
+                    valid = true;
+                    for (int i = 0;i<instruments.length;i++) {
+                        String instr= instruments[i];
+                        if(instr.equalsIgnoreCase("")) {
+                            valid = true;
+                            break;
+                        }
+                        if(!validInstruments.contains(instr)) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    logger.info(input);
+                }    
+                if(!input.equalsIgnoreCase(""))
+                    numInsAdded+=input.split(" ").length;
+                mapping.put(orb,input.split(" "));
+            } catch (Exception e) {
+                System.out.println("EXC in askUserToImprove" + e.getMessage() + " " + e.getClass());
+            }           
+        }
+        return new Architecture(mapping,orig.getNsats());
     }
 }

@@ -40,7 +40,7 @@ public class ATeamsManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private final int populationSize = 200;
-    private final int maxEval = 2000;
+    private final int maxEval = 1000;
     
     @Override
     protected void activate() {
@@ -66,8 +66,8 @@ public class ATeamsManager extends DesignAgent{
         AE.init(1);
         AE.evalMinMax();
         AE.clear();
-        for(int i=0;i<20;i++){
-            
+        for(int i=0;i<10;i++){
+            AgentEvaluationCounter.setNumIter(i);
             AE.init(11);
             
             // initialize buffer agents
@@ -78,13 +78,9 @@ public class ATeamsManager extends DesignAgent{
             //initiate population and send to unevaluated buffer
             ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
             initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            if(initPop.size()!=populationSize)
-                System.out.println("why population size not right?");
             AE.setPopulation(initPop);
             AE.evaluatePopulation();
             Stack<Result> stackRes =  AE.getResults();
-            if(stackRes.size()!=populationSize)
-                System.out.println("why population size not right?");
             Iterator<Result> iter = stackRes.iterator();
             AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
             while(iter.hasNext()){
@@ -96,7 +92,7 @@ public class ATeamsManager extends DesignAgent{
             try {
                 searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDSYNERGY,ManagerMode.ATEAM));
                 searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ADDTOSMALLSAT,ManagerMode.ATEAM));
-//            searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ASKUSER,ManagerMode.ATEAM));
+                searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.ASKUSER,ManagerMode.ATEAM));
                 searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.BESTNEIGHBOR,ManagerMode.ATEAM));
                 searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.CROSSOVER,ManagerMode.ATEAM));
                 searchAgents.addAll(launchAgentsIntoLive(ModifyAgent.class,1,ModifyAgent.ModifyMode.IMPROVEORBIT,ManagerMode.ATEAM));
@@ -126,6 +122,8 @@ public class ATeamsManager extends DesignAgent{
             killAgentsInList(bufferAgents);
             waitNextMessage();
             killAgentsInList(ancillaryAgents);
+            while(!AgentEvaluationCounter.isSorterDead())
+                pause(1000);
 //            killAgent(ancillaryAgents.iterator().next(),1000);
             
             System.out.println("Done");

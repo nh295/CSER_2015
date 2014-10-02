@@ -30,6 +30,8 @@ public class AgentEvaluationCounter {
     private static HashMap<ModifyMode,ArrayList<Integer>> dominanceHistory;
     private static int totalEval;
     private static int archSortSaves;
+    private static boolean sorterIsDead;
+    private static int numIteration;
     
     
     private AgentEvaluationCounter(){
@@ -38,6 +40,15 @@ public class AgentEvaluationCounter {
         dominanceHistory =  new HashMap();
         totalEval = 0;
         archSortSaves = 0;
+        sorterIsDead = false;
+    }
+    
+    public static int getNumIter(){
+        return numIteration;
+    }
+    
+    public static void setNumIter(int i){
+        numIteration = i;
     }
     
     public static AgentEvaluationCounter getInstance(){
@@ -96,6 +107,14 @@ public class AgentEvaluationCounter {
    
    public static int getSPSaveCount(){
        return archSortSaves;
+   }
+   
+   public static boolean isSorterDead(){
+       return sorterIsDead;
+   }
+   
+   public static void setSorterDead(){
+       sorterIsDead=true;
    }
     
     public static void saveAgentStats(int i){

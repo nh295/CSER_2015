@@ -4,6 +4,7 @@
  */
 package rbsa.eoss.local;
 
+import madkitdemo3.PracticeManager;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -47,10 +48,10 @@ public class RBSAEOSSSMAP {
         //PATH
         //String path  = "C:\\Users\\DS925\\Documents\\GitHub\\RBES_EOSS";//RBES SMAP for IEEEAero14 code
 //        String path  = "C:\\Users\\Ana-Dani\\Documents\\GitHub\\RBES_EOSS";
-        String path = "C:\\Users\\Nozomi\\Documents\\CSER_2015";
-//        String path = "C:\\Users\\SEAK1\\Nozomi\\CSER_2015";
+//        String path = "C:\\Users\\Nozomi\\Documents\\CSER_2015";
+        String path = "C:\\Users\\SEAK1\\Nozomi\\CSER_2015";
         
-        int MODE = 11;
+        int MODE = 10;
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         ArchTradespaceExplorer ATE = ArchTradespaceExplorer.getInstance();
         ResultManager RM = ResultManager.getInstance();
@@ -275,8 +276,12 @@ public class RBSAEOSSSMAP {
                 params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
                 kernel= new Madkit("--launchAgents",DMABManager.class.getName() + ",true,1;");
                 break;
+            case 12: //user practice mode
+                params = new Params( path, "FUZZY-ATTRIBUTES", "test","normal","");//FUZZY or CRISP
+                kernel= new Madkit("--launchAgents",PracticeManager.class.getName() + ",true,1;");
+                break;
             default:
-                System.out.println("Choose a mode between 1 and 11");
+                System.out.println("Choose a mode between 1 and 12");
         }
         
     }
