@@ -29,6 +29,8 @@ import rbsa.eoss.Architecture;
 import rbsa.eoss.ArchitectureEvaluator;
 import rbsa.eoss.ArchitectureGenerator;
 import rbsa.eoss.Result;
+import rbsa.eoss.ResultCollection;
+import rbsa.eoss.ResultManager;
 import rbsa.eoss.local.Params;
 
 
@@ -41,8 +43,10 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
+    private final boolean continueFromHumanMode = false;
+    private ResultManager RM;
     private final int populationSize = 200;
-    private final int maxEvals = 20;
+    private final int maxEvals = 5000;
     private Random rand = new Random();
     
     @Override
@@ -60,7 +64,8 @@ public class DMABManager extends DesignAgent{
         for(ModifyMode mod:ModifyMode.values()){
             modes.add(mod);
         }
-        MultiAgentArms.init(modes,0.1,5,5);
+        MultiAgentArms.init(modes,0.1,3,5);
+        RM = ResultManager.getInstance();
     }
         
     @Override
@@ -71,7 +76,7 @@ public class DMABManager extends DesignAgent{
         AE.evalMinMax();
         AE.clear();
         for(int i=0;i<10;i++){
-            AE.init(11);
+            AE.init(3);
              
             AgentEvaluationCounter.getInstance();
             AgentSelectionHistory.getInstance();
@@ -83,12 +88,25 @@ public class DMABManager extends DesignAgent{
             initSendProb(bufferAgents);
             initSendProb(ancillaryAgents);
             
-            //initiate population and send to unevaluated buffer
-            ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
-            AE.setPopulation(initPop);
-            System.out.println("Evaluating Initial Population");
-            AE.evaluatePopulation();
-            Stack<Result> stackRes =  AE.getResults();
+            Stack<Result> stackRes;
+            if(continueFromHumanMode){
+                String path = "C:\\Users\\Nozomi\\Documents\\CSER_2015\\Monica DMAB\\";
+                String dmabFile = "DMABHistory0_2014-10-02--17-16-42.rs";
+                String resultFile = "2014-10-02_17-15-52_test.rs";
+                String statFile = "stat0_2014-10-02--17-16-42.rs";
+                ResultCollection rescol = RM.loadResultCollectionFromFile(path+resultFile);
+                stackRes = rescol.getResults();
+                AgentEvaluationCounter.loadAgentStatFromFile(path+statFile);
+                AgentSelectionHistory.loadSelectionHistoryFromFile(path+dmabFile);
+            }else{
+                //initiate population and send to unevaluated buffer
+                ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
+                AE.setPopulation(initPop);
+                System.out.println("Evaluating Initial Population");
+                AE.evaluatePopulation();
+                stackRes =  AE.getResults();
+            }
+            
             Iterator<Result> iter = stackRes.iterator();
             AgentAddress evalBufferAddress = findAgent(COMMUNITY, aDesignTeam, evaluatedBuffer);
             while(iter.hasNext()){
@@ -157,7 +175,7 @@ public class DMABManager extends DesignAgent{
         if(totalPlayCount == 0 || totalPlayCount==1)
             totalPlayCount = 1.000001;
         for(ModifyMode mode:ModifyMode.values()){
-            if(mode!=ModifyMode.ASKUSER&&mode!=ModifyMode.BESTNEIGHBOR){
+//            if(mode!=ModifyMode.ASKUSER&&mode!=ModifyMode.BESTNEIGHBOR){
                 double p = MultiAgentArms.getAvgValues(mode);
                 if(Double.isNaN(p))
                     p=0;
@@ -166,11 +184,11 @@ public class DMABManager extends DesignAgent{
                 if(val>=max){
                     max = val;
                 }
-            }
+//            }
         }
         for(ModifyMode mode:ModifyMode.values()){
-            if(mode==ModifyMode.ASKUSER || mode==ModifyMode.BESTNEIGHBOR)
-                break;
+//            if(mode==ModifyMode.ASKUSER || mode==ModifyMode.BESTNEIGHBOR)
+//                break;
             if(scores.get(mode)==max){
                 potentialModes.add(mode);
             }

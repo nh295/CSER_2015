@@ -69,7 +69,8 @@ public class ATeamsManager extends DesignAgent{
     protected void live() {
         ArchitectureEvaluator AE = ArchitectureEvaluator.getInstance();
         AE.init(1);
-        AE.evalMinMax();
+        AE.evalMinMax();        
+        System.out.println("Evaluating Min Max");
         AE.clear();
         for(int i=0;i<10;i++){
             AgentEvaluationCounter.getInstance();
@@ -91,6 +92,7 @@ public class ATeamsManager extends DesignAgent{
                 ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
                 initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
                 AE.setPopulation(initPop);
+                System.out.println("Evaluating Initial Population");                
                 AE.evaluatePopulation();
                 stackRes =  AE.getResults();
             }
