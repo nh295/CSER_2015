@@ -43,7 +43,7 @@ public class DMABManager extends DesignAgent{
     private static final Collection<AbstractAgent> bufferAgents = new ArrayList();
     private static final Collection<AbstractAgent> ancillaryAgents = new ArrayList();
     private static Collection<AbstractAgent> searchAgents = new ArrayList();
-    private final boolean continueFromHumanMode = false;
+    private final boolean continueFromHumanMode = true;
     private ResultManager RM;
     private final int populationSize = 200;
     private final int maxEvals = 5000;
@@ -75,7 +75,7 @@ public class DMABManager extends DesignAgent{
         System.out.println("Evaluating Min Max");
         AE.evalMinMax();
         AE.clear();
-        for(int i=0;i<10;i++){
+        for(int i=0;i<2;i++){
             AE.init(3);
              
             AgentEvaluationCounter.getInstance();
@@ -90,14 +90,14 @@ public class DMABManager extends DesignAgent{
             
             Stack<Result> stackRes;
             if(continueFromHumanMode){
-                String path = "C:\\Users\\Nozomi\\Documents\\CSER_2015\\Monica DMAB\\";
-                String dmabFile = "DMABHistory0_2014-10-02--17-16-42.rs";
-                String resultFile = "2014-10-02_17-15-52_test.rs";
-                String statFile = "stat0_2014-10-02--17-16-42.rs";
-                ResultCollection rescol = RM.loadResultCollectionFromFile(path+resultFile);
+                String[] path = {"C:\\Users\\Nozomi\\Documents\\CSER_2015\\results\\Harris\\","C:\\Users\\Nozomi\\Documents\\CSER_2015\\results\\Spandan\\"};
+                String[] dmabFile = {"DMABHistory0_2014-10-03--16-25-46.rs","DMABHistory0_2014-10-03--20-15-17.rs"};
+                String[] resultFile = {"2014-10-03_16-25-03_test.rs","2014-10-03_20-14-32_test.rs"};
+                String[] statFile = {"stat0_2014-10-03--16-25-46.rs","stat0_2014-10-03--20-15-17.rs"};
+                ResultCollection rescol = RM.loadResultCollectionFromFile(path[i]+resultFile[i]);
                 stackRes = rescol.getResults();
-                AgentEvaluationCounter.loadAgentStatFromFile(path+statFile);
-                AgentSelectionHistory.loadSelectionHistoryFromFile(path+dmabFile);
+                AgentEvaluationCounter.loadAgentStatFromFile(path[i]+statFile[i]);
+                AgentSelectionHistory.loadSelectionHistoryFromFile(path[i]+dmabFile[i]);
             }else{
                 //initiate population and send to unevaluated buffer
                 ArrayList<Architecture> initPop = ArchitectureGenerator.getInstance().getInitialPopulation(populationSize);
@@ -175,7 +175,7 @@ public class DMABManager extends DesignAgent{
         if(totalPlayCount == 0 || totalPlayCount==1)
             totalPlayCount = 1.000001;
         for(ModifyMode mode:ModifyMode.values()){
-//            if(mode!=ModifyMode.ASKUSER&&mode!=ModifyMode.BESTNEIGHBOR){
+            if(mode!=ModifyMode.ASKUSER){
                 double p = MultiAgentArms.getAvgValues(mode);
                 if(Double.isNaN(p))
                     p=0;
@@ -184,11 +184,11 @@ public class DMABManager extends DesignAgent{
                 if(val>=max){
                     max = val;
                 }
-//            }
+            }
         }
         for(ModifyMode mode:ModifyMode.values()){
-//            if(mode==ModifyMode.ASKUSER || mode==ModifyMode.BESTNEIGHBOR)
-//                break;
+            if(mode==ModifyMode.ASKUSER)
+                break;
             if(scores.get(mode)==max){
                 potentialModes.add(mode);
             }
